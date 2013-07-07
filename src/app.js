@@ -22,3 +22,4 @@ require.config({
         'ng-table': '../bower_components/ng-table/ng-table'
     }
 });
+require(['bazalt-login']);

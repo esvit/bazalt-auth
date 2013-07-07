@@ -29,7 +29,7 @@ module.exports = (grunt) ->
           wrap: true
           mainConfigFile: 'src/app.js'
           name: 'bazalt-login'
-          include: ['bazalt-login']
+          include: ['controllers', 'directives', 'factories']
           exclude: ['jquery','angular','angular-resource']
           out: 'bazalt-login.js'
 
