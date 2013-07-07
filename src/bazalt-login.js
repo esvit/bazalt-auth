@@ -1,4 +1,4 @@
-define('bazalt-login', ['jquery', 'angular', 'angular-resource'/*, 'main', 'controllers', 'directives', 'factories', 'filters', 'views'*/], function ($, angular) {
+define('bazalt-login', ['jquery', 'angular', 'angular-resource', 'controllers', 'directives', 'factories'/*, 'main', 'controllers', 'filters', 'views'*/], function ($, angular) {
     'use strict';
 
     return angular.module('bazalt-login', [])
