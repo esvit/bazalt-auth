@@ -5,13 +5,13 @@ define('bazalt-login/directives/remoteForm', ['bazalt-login/app'], function(modu
             'restrict':'A',
             'scope':false,
             'require': 'form',
-            'controller':function ($scope, $element, $attrs) {
+            'controller': ['$scope', function ($scope) {
                 $scope.invalidForm = function() {
                     
                 }
-            },
+            }],
 
-            'link':function (scope, element, attrs, ctrl) {
+            'link': function (scope, element, attrs, ctrl) {
                 ctrl.invalidForm = function(data) {
                     $log.error(data);
                     angular.forEach(data, function(field, fieldName) {

@@ -1,33 +1,22 @@
-// Require.js allows us to configure shortcut alias
 require.config({
+    baseUrl: '../src',
     shim: {
-        angular: {
+        'angular': {
             exports: 'angular'
         },
         'angular-resource': {
-            exports: 'angular'
-        },
-        'views': {
-            deps: ['main']
+            deps: ['angular']
         }
     },
     paths: {
-        jquery: '../components/jquery/jquery.min',
-        angular: '../components/angular/angular.min',
-        'angular-resource': '../components/angular-resource/angular-resource.min',
-        'angular-loader': '../components/angular-loader/angular-loader.min',
-        'elasticjs': '../components/elastic.js/dist/elastic.min',
-        'angular-elastic': '../components/elastic.js/dist/elastic-angular-client.min',
-        'social-likes': '../components/social-likes/social-likes.min',
-        'jquery-timeago': '../components/jquery-timeago/jquery.timeago',
-        'ng-table': '../components/ng-table/ng-table'
+        'jquery': '../bower_components/jquery/jquery',
+        'angular': '../bower_components/angular/angular',
+        'angular-resource': '../bower_components/angular-resource/angular-resource'
     }
 });
 
-define('app', ['jquery', 'angular', '.', 'main', 'controllers', 'factories', 'directives'], function ($, angular) {
+define(['angular', '../example/main'], function (angular, a) {
     'use strict';
-
+console.info(a);
     angular.bootstrap(document.documentElement, ['app']);
 });
-
-require(['app'], function() {});

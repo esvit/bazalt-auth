@@ -4,7 +4,7 @@ require.config({
             exports: 'angular'
         },
         'angular-resource': {
-            exports: 'angular'
+            deps: ['angular']
         }
     },
     paths: {
