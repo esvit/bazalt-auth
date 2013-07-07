@@ -1,73 +1,73 @@
 (function () {
-define('bazalt-login', ['jquery', 'angular', 'angular-resource'], function ($, angular) {
+define('bazalt-login/app', ['jquery', 'angular', 'angular-resource'], function ($, angular) {
     'use strict';
 
     return angular.module('bazalt-login', [])
-    .provider('bazaltLogin', function () {
-        this.$baseUrl = '/user';
-        this.$templateUrl = '/views/user';
+        .provider('bazaltLogin', function () {
+            this.$baseUrl = '/user';
+            this.$templateUrl = '/views/user';
 
-        this.baseUrl = function(baseUrl) {
-            this.$baseUrl = baseUrl;
-        }
-
-        this.templateUrl = function(templateUrl) {
-            this.$templateUrl = templateUrl;
-        }
-
-        this.$get = function() {
-            var self = this;
-            return {
-                baseUrl: function() {
-                    return self.$baseUrl;
-                },
-                templateUrl: function() {
-                    return self.$templateUrl;
-                }
+            this.baseUrl = function(baseUrl) {
+                this.$baseUrl = baseUrl;
             }
-        };
-    })
-    .config(['$routeProvider', '$locationProvider', 'bazaltLoginProvider', function($routeProvider, $locationProvider, bazaltLoginProvider) {
-        var baseUrl     = bazaltLoginProvider.$baseUrl,
-            templateUrl = bazaltLoginProvider.$templateUrl;
-        $routeProvider
-            // registration routes
-            .when(baseUrl + '/register', {
-                templateUrl: templateUrl + '/account/registerForm.html',
-                controller: 'RegisterCtrl'
-            })
-            .when(baseUrl + '/terms', {
-                templateUrl: templateUrl + '/modals/terms.html',
-                controller: 'ModalCtrl'
-            })
-            .when(baseUrl + '/privacy', {
-                templateUrl: templateUrl + '/modals/privacy.html',
-                controller: 'ModalCtrl'
-            })
-            .when(baseUrl + '/activationSent', {
-                templateUrl: templateUrl + '/account/registerSuccessMessage.html'
-            })
-            .when(baseUrl + '/resendActivation', {
-                templateUrl: templateUrl + '/account/resendActivationForm.html',
-                controller: 'RegisterCtrl'
-            })
-            .when(baseUrl + '/activationResent', {
-                templateUrl: templateUrl + '/account/activationResentMessage.html',
-                controller: 'RegisterCtrl'
-            })
-            .when(baseUrl + '/activate/:activationKey', {
-                templateUrl: templateUrl + '/account/activationResentMessage.html',
-                controller: 'RegisterCtrl'
-            })
 
-            // login routes
-            .when(baseUrl + '/login', {
-                templateUrl: templateUrl + '/account/loginForm.html',
-                controller: 'LoginCtrl'
-            });
-    }]);
+            this.templateUrl = function(templateUrl) {
+                this.$templateUrl = templateUrl;
+            }
+
+            this.$get = function() {
+                var self = this;
+                return {
+                    baseUrl: function() {
+                        return self.$baseUrl;
+                    },
+                    templateUrl: function() {
+                        return self.$templateUrl;
+                    }
+                }
+            };
+        })
+        .config(['$routeProvider', '$locationProvider', 'bazaltLoginProvider', function($routeProvider, $locationProvider, bazaltLoginProvider) {
+            var baseUrl     = bazaltLoginProvider.$baseUrl,
+                templateUrl = bazaltLoginProvider.$templateUrl;
+            $routeProvider
+                // registration routes
+                .when(baseUrl + '/register', {
+                    templateUrl: templateUrl + '/account/registerForm.html',
+                    controller: 'RegisterCtrl'
+                })
+                .when(baseUrl + '/terms', {
+                    templateUrl: templateUrl + '/modals/terms.html',
+                    controller: 'ModalCtrl'
+                })
+                .when(baseUrl + '/privacy', {
+                    templateUrl: templateUrl + '/modals/privacy.html',
+                    controller: 'ModalCtrl'
+                })
+                .when(baseUrl + '/activationSent', {
+                    templateUrl: templateUrl + '/account/registerSuccessMessage.html'
+                })
+                .when(baseUrl + '/resendActivation', {
+                    templateUrl: templateUrl + '/account/resendActivationForm.html',
+                    controller: 'RegisterCtrl'
+                })
+                .when(baseUrl + '/activationResent', {
+                    templateUrl: templateUrl + '/account/activationResentMessage.html',
+                    controller: 'RegisterCtrl'
+                })
+                .when(baseUrl + '/activate/:activationKey', {
+                    templateUrl: templateUrl + '/account/activationResentMessage.html',
+                    controller: 'RegisterCtrl'
+                })
+
+                // login routes
+                .when(baseUrl + '/login', {
+                    templateUrl: templateUrl + '/account/loginForm.html',
+                    controller: 'LoginCtrl'
+                });
+        }]);
 });
-define('controllers/RegisterCtrl',['bazalt-login'], function(module) {
+define('bazalt-login/controllers/RegisterCtrl', ['bazalt-login/app'], function(module) {
 
     module.controller('RegisterCtrl', ['$scope', '$location', 'UserResource', 'bazaltLogin', function($scope, $location, UserResource, bazaltLogin) {
         $scope.form = {};
@@ -92,7 +92,7 @@ define('controllers/RegisterCtrl',['bazalt-login'], function(module) {
     }]);
 
 });
-define('controllers/LoginCtrl',['bazalt-login'], function(module) {
+define('bazalt-login/controllers/LoginCtrl', ['bazalt-login/app'], function(module) {
 
     module.controller('LoginCtrl', ['$scope', '$location', 'UserResource', function($scope, $location, UserResource) {
         $scope.form = {};
@@ -108,7 +108,7 @@ define('controllers/LoginCtrl',['bazalt-login'], function(module) {
     }]);
 
 });
-define('controllers/ModalCtrl',['bazalt-login'], function(module) {
+define('bazalt-login/controllers/ModalCtrl', ['bazalt-login/app'], function(module) {
 
     module.controller('ModalCtrl', ['$scope', function($scope) {
         this.setModel = function(data) {
@@ -120,13 +120,13 @@ define('controllers/ModalCtrl',['bazalt-login'], function(module) {
     }]);
 
 });
-define('controllers', [
-    'controllers/RegisterCtrl',
-    'controllers/LoginCtrl',
-    'controllers/ModalCtrl'
+define('bazalt-login/controllers', [
+    'bazalt-login/controllers/RegisterCtrl',
+    'bazalt-login/controllers/LoginCtrl',
+    'bazalt-login/controllers/ModalCtrl'
 ], function(angular) {
 });
-define('directives/remoteForm',['bazalt-login'], function(module) {
+define('bazalt-login/directives/remoteForm', ['bazalt-login/app'], function(module) {
 
     module.directive('remoteForm', ['$log', function ($log) {
         return {
@@ -161,11 +161,11 @@ define('directives/remoteForm',['bazalt-login'], function(module) {
     }])
 
 });
-define('directives', [
-    'directives/remoteForm'
+define('bazalt-login/directives', [
+    'bazalt-login/directives/remoteForm'
 ], function(angular) {
 });
-define('factories/UserResource',['bazalt-login'], function(module) {
+define('bazalt-login/factories/UserResource', ['bazalt-login/app'], function(module) {
 
     module.factory('UserResource', ['$resource', '$q', function ($resource, $q) {
         return $resource('/rest.php/user', {}, {
@@ -175,7 +175,7 @@ define('factories/UserResource',['bazalt-login'], function(module) {
     }]);
 
 });
-define('factories/errorHttpInterceptor',['bazalt-login'], function(module) {
+define('bazalt-login/factories/errorHttpInterceptor', ['bazalt-login/app'], function(module) {
 
     module.factory('errorHttpInterceptor', ['$q', function($q) {
         return function (promise) {
@@ -194,8 +194,13 @@ define('factories/errorHttpInterceptor',['bazalt-login'], function(module) {
       }]);
 
 });
-define('factories', [
-    'factories/UserResource',
-    'factories/errorHttpInterceptor'
+define('bazalt-login/factories', [
+    'bazalt-login/factories/UserResource',
+    'bazalt-login/factories/errorHttpInterceptor'
 ], function(angular) {
+});
+define('bazalt-login', ['bazalt-login/controllers', 'bazalt-login/directives', 'bazalt-login/factories', 'bazalt-login/app'], function () {
+    'use strict';
+
+    return angular.module('bazalt-login');
 });}());

@@ -1,4 +1,4 @@
-define(['bazalt-login'], function(module) {
+define('bazalt-login/controllers/ModalCtrl', ['bazalt-login/app'], function(module) {
 
     module.controller('ModalCtrl', ['$scope', function($scope) {
         this.setModel = function(data) {

@@ -1,4 +1,4 @@
-define(['bazalt-login'], function(module) {
+define('bazalt-login/controllers/RegisterCtrl', ['bazalt-login/app'], function(module) {
 
     module.controller('RegisterCtrl', ['$scope', '$location', 'UserResource', 'bazaltLogin', function($scope, $location, UserResource, bazaltLogin) {
         $scope.form = {};

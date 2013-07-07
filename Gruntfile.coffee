@@ -27,9 +27,9 @@ module.exports = (grunt) ->
           preserveLicenseComments: false
           useStrict: true
           wrap: true
-          mainConfigFile: 'src/app.js'
+          mainConfigFile: 'src/config.js'
           name: 'bazalt-login'
-          include: ['controllers', 'directives', 'factories']
+          include: ['bazalt-login']
           exclude: ['jquery','angular','angular-resource']
           out: 'bazalt-login.js'
 
