@@ -1,0 +1,13 @@
+{
+  "name": "bazalt-login",
+  "version": "0.0.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "bower_components",
+    "server",
+    "test",
+    "tests"
+  ]
+}
