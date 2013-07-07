@@ -1,4 +1,4 @@
-define(['main'], function(module) {
+define(['bazalt-login'], function(module) {
 
     module.directive('remoteForm', ['$log', function ($log) {
         return {

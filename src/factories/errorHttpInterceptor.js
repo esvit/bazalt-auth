@@ -1,4 +1,4 @@
-define(['main'], function(module) {
+define(['bazalt-login'], function(module) {
 
     module.factory('errorHttpInterceptor', ['$q', function($q) {
         return function (promise) {

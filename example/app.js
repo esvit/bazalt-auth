@@ -14,7 +14,6 @@ require.config({
     paths: {
         jquery: '../components/jquery/jquery.min',
         angular: '../components/angular/angular.min',
-        'angular-google-analytics': '../components/angular-google-analytics/src/angular-google-analytics',
         'angular-resource': '../components/angular-resource/angular-resource.min',
         'angular-loader': '../components/angular-loader/angular-loader.min',
         'elasticjs': '../components/elastic.js/dist/elastic.min',
@@ -25,7 +24,7 @@ require.config({
     }
 });
 
-define('app', ['jquery', 'angular', 'bazalt-login', 'main', 'controllers', 'factories', 'directives'], function ($, angular) {
+define('app', ['jquery', 'angular', '.', 'main', 'controllers', 'factories', 'directives'], function ($, angular) {
     'use strict';
 
     angular.bootstrap(document.documentElement, ['app']);

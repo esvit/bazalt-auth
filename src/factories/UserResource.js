@@ -1,4 +1,4 @@
-define(['main'], function(module) {
+define(['bazalt-login'], function(module) {
 
     module.factory('UserResource', ['$resource', '$q', function ($resource, $q) {
         return $resource('/rest.php/user', {}, {

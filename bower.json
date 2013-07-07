@@ -9,5 +9,10 @@
     "server",
     "test",
     "tests"
-  ]
+  ],
+    "dependencies": {
+        "angular": "~1.0.6",
+        "jquery": "~2.0.2",
+        "angular-resource": "~1.0.7"
+    }
 }
