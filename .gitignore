@@ -1,7 +1,7 @@
 # Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
 node_modules
-server/vendor
-src/components
+vendor
+bower_components
 composer.lock
 composer.phar
 .svn
