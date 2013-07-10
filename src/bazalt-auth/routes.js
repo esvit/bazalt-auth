@@ -39,6 +39,10 @@ define('bazalt-auth/routes', ['bazalt-auth/app'], function (module) {
             .when(baseUrl + '/login', {
                 templateUrl: templateUrl + '/account/loginForm.html',
                 controller: 'LoginCtrl'
+            })
+            .when(baseUrl + '/logout', {
+                template: 'Loading...',
+                controller: 'LogoutCtrl'
             });
     }]);
 

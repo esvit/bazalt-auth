@@ -21,10 +21,10 @@ class Guest extends User
             $user->hasName = false;
         }
         if (empty($user->password)) {
-            $user->password = CMS\User::generateRandomPassword();
+            //$user->password = CMS\User::generateRandomPassword();
 //            $user->setting('password', $user->password);
         }
-        $user->password = CMS\User::criptPassword($user->password);
+        //$user->password = CMS\User::criptPassword($user->password);
         $user->session_id = $sessionId;
 
         return $user;
@@ -92,10 +92,10 @@ class Guest extends User
     {
         $session = new Session('guestSetting');
         if ($value !== null) {
-            $session->{$settingName} = $value;
+            $session->{$name} = $value;
         }
-        if (isset($session->{$settingName})) {
-            return $session->{$settingName};
+        if (isset($session->{$name})) {
+            return $session->{$name};
         }
         return $default;
     }

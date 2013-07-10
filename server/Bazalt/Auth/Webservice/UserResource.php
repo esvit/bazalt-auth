@@ -39,7 +39,11 @@ class UserResource extends \Tonic\Resource
      */
     public function getUser()
     {
-        $user = User::getById($_GET['id']);
+        if (isset($_GET['id'])) {
+            $user = User::getById($_GET['id']);
+        } else {
+            $user = \Bazalt\Auth::getUser();
+        }
         return new Response(Response::OK, $user->toArray());
     }
 
@@ -61,6 +65,17 @@ class UserResource extends \Tonic\Resource
             return new Response(400, $data->errors());
         }
         $user->login();
+        return new Response(Response::OK, $user->toArray());
+    }
+
+    /**
+     * @method DELETE
+     * @json
+     */
+    public function logout()
+    {
+        \Bazalt\Auth::logout();
+        $user = \Bazalt\Auth::getUser();
         return new Response(Response::OK, $user->toArray());
     }
 

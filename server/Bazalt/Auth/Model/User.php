@@ -51,13 +51,13 @@ class User extends Base\User
      */
     public static function getByIdAndSession($id, $sessionId = null)
     {
-        $q = ORM::select('Bazalt\Auth\Model\User u')
-                ->leftJoin('Bazalt\Auth\Model\SiteRefUser ref', array('user_id', 'u.id'))
-                ->where('ref.user_id = ?', $id)
-                ->andWhere('ref.site_id = ?', CMS\Bazalt::getSiteID());
+        $q = ORM::select('Bazalt\Auth\Model\User u');
+                //->leftJoin('Bazalt\Auth\Model\SiteRefUser ref', array('user_id', 'u.id'))
+                //->where('ref.user_id = ?', $id)
+                //->andWhere('ref.site_id = ?', CMS\Bazalt::getSiteID());
 
         if ($sessionId != null) {
-            $q->andWhere('ref.session_id = ?', $sessionId);
+            //$q->andWhere('ref.session_id = ?', $sessionId);
         }
         return $q->noCache()->fetch();
     }
