@@ -7,14 +7,14 @@ module.exports = (grunt) ->
     clean:
       working:
         src: [
-          'bazalt-login.*'
+          'bazalt-auth.*'
         ]
 
     uglify:
     # concat js files before minification
       js:
-        src: ['bazalt-login.js']
-        dest: 'bazalt-login.min.js'
+        src: ['bazalt-auth.js']
+        dest: 'bazalt-auth.min.js'
         options:
           sourceMap: (fileName) ->
             fileName.replace /\.js$/, '.map'
@@ -28,10 +28,10 @@ module.exports = (grunt) ->
           useStrict: true
           wrap: true
           mainConfigFile: 'src/config.js'
-          name: 'bazalt-login'
-          include: ['bazalt-login']
+          name: 'bazalt-auth'
+          include: ['bazalt-auth']
           exclude: ['jquery','angular','angular-resource']
-          out: 'bazalt-login.js'
+          out: 'bazalt-auth.js'
 
   grunt.loadNpmTasks 'grunt-contrib-clean'
   grunt.loadNpmTasks 'grunt-contrib-copy'

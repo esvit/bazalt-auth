@@ -1,5 +1,5 @@
 {
-    "name": "bazalt/login",
+    "name": "bazalt/auth",
     "license": "New BSD License",
     "authors": [
         {
@@ -9,7 +9,7 @@
     ],
     "autoload": {
         "psr-0": {
-            "Bazalt\\Login": "server"
+            "Bazalt\\Auth": "server"
         }
     },
     "require": {
@@ -19,6 +19,7 @@
         "peej/tonic": "*",
         "filp/whoops": "*",
         "bazalt/data": "dev-master",
-        "swiftmailer/swiftmailer": "*"
+        "swiftmailer/swiftmailer": "*",
+        "bazalt/session": "dev-master"
     }
 }

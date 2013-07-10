@@ -1,9 +1,9 @@
 <?php
 
-require '../server/config.php';
+require 'config.php';
 
 $app = new Tonic\Application(array(
-    'load' => __DIR__ . '/../server/Bazalt/Login/Webservice/*.php'
+    'load' => __DIR__ . '/../server/Bazalt/Auth/Webservice/*.php'
 ));
 $request = new Tonic\Request(array(
     'uri' => $_SERVER['PATH_INFO']

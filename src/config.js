@@ -10,6 +10,7 @@ require.config({
     paths: {
         'jquery': '../bower_components/jquery/jquery.min',
         'angular': '../bower_components/angular/angular.min',
-        'angular-resource': '../bower_components/angular-resource/angular-resource.min'
+        'angular-resource': '../bower_components/angular/angular-resource',
+        'angular-cookies': '../bower_components/angular/angular-cookies'
     }
 });
