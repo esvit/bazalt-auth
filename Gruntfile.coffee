@@ -30,7 +30,7 @@ module.exports = (grunt) ->
           mainConfigFile: 'src/config.js'
           name: 'bazalt-auth'
           include: ['bazalt-auth']
-          exclude: ['jquery','angular','angular-resource']
+          exclude: ['jquery','angular','angular-resource','angular-cookies']
           out: 'bazalt-auth.js'
 
   grunt.loadNpmTasks 'grunt-contrib-clean'
