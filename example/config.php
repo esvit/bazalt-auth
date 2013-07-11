@@ -39,3 +39,5 @@ $connectionString = new \Bazalt\ORM\Adapter\Mysql([
     'password' => 'awdawd'
 ]);
 \Bazalt\ORM\Connection\Manager::add($connectionString, 'default');
+
+\Bazalt\Session::setTimeout(30 * 24 * 60 * 60);

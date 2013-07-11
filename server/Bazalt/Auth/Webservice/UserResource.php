@@ -64,7 +64,7 @@ class UserResource extends \Tonic\Resource
         if (!$data->validate()) {
             return new Response(400, $data->errors());
         }
-        $user->login();
+        $user->login($data['remember_me'] == 'true');
         return new Response(Response::OK, $user->toArray());
     }
 
