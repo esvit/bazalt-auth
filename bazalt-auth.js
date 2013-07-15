@@ -52,7 +52,7 @@ define('bazalt-auth/controllers/LoginCtrl', ['bazalt-auth/app'], function(module
        $scope.loginUser = function () {
             var data = $scope.form;
             blAcl.login(data, function(user) {
-                $location.path('/');
+                $location.path('/user/profile');
             }, function(res) {
                 if (res.status == 400) $scope.login.invalidForm(res.data);
             });
@@ -395,8 +395,8 @@ define('bazalt-auth/blConfig', ['bazalt-auth/app'], function (module) {
 define('bazalt-auth/blAcl', ['bazalt-auth/app'], function (module) {
     'use strict';
 
-    module.factory('blAcl', ['$rootScope', 'UserResource', 'blConfig', '$cookieStore', '$location',
-                     function($rootScope,   UserResource,   blConfig,   $cookieStore,   $location) {
+    module.factory('blAcl', ['$rootScope', 'UserResource', 'blConfig', '$cookieStore', '$log',
+                     function($rootScope,   UserResource,   blConfig,   $cookieStore,   $log) {
         var $user = {
             role: blConfig.roles().public
         },
@@ -407,7 +407,7 @@ define('bazalt-auth/blAcl', ['bazalt-auth/app'], function (module) {
                 user.role = blConfig.roles().public;
             }
             $user = user;
-            $location.path('/');
+            $log.info('User login', $user);
             if (!$rootScope.$$phase) {
                 $rootScope.$apply();
             }
