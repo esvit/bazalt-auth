@@ -44,11 +44,20 @@ class UserResource extends \Tonic\Resource
             return new Response(Response::OK, $user->toArray());
         } else {
             $users = User::getCollection();
+            $users->page((int)$_GET['page']);
+            $users->countPerPage((int)$_GET['count']);
             $result = [];
-            foreach ($users as $user) {
+            foreach ($users->fetchPage() as $user) {
                 $result []= $user->toArray();
             }
-            return new Response(Response::OK, $result);
+            return new Response(Response::OK,[
+                'data' => $result,
+                'pager' => [
+                    'current' => $users->page(),
+                    'count'   => $users->getPagesCount(),
+                    'total'   => $users->count(),
+                    'countPerPage'   => $users->countPerPage()
+                ]]);
         }
     }
 

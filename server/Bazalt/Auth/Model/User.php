@@ -172,6 +172,7 @@ class User extends Base\User
         foreach ($this->Roles as $role) {
             $ret['roles'][] = $role->id;
         }
+        $ret['fullname'] = $this->getName();
         return $ret;
     }
 
@@ -363,7 +364,7 @@ class User extends Base\User
     {
         $q = ORM::select('Bazalt\Auth\Model\User f')
                 ->orderBy('is_active ASC');
-        return new CMS_ORM_Collection($q);
+        return new \Bazalt\ORM\Collection($q);
     }
 
     public function addAfterLoginRole()

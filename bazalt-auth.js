@@ -217,11 +217,27 @@ define('bazalt-auth/directives', [
 define('bazalt-auth/factories/baUserResource', ['bazalt-auth/app'], function(module) {
 
     module.factory('baUserResource', ['$resource', '$q', 'baConfig', function ($resource, $q, baConfig) {
-        return $resource(baConfig.apiEndpoint(), {}, {
-            login: { method: 'POST' },
-            logout: { method: 'DELETE' },
+        return $resource(baConfig.apiEndpoint() + '/user', {}, {
             checkEmail: { method: 'GET', params: { 'action': 'checkEmail' } },
             register: { method: 'PUT' }
+        });
+    }]);
+
+});
+define('bazalt-auth/factories/baSessionResource', ['bazalt-auth/app'], function(module) {
+
+    module.factory('baSessionResource', ['$resource', '$q', 'baConfig', function ($resource, $q, baConfig) {
+        return $resource(baConfig.apiEndpoint() + '/session', {}, {
+            login: { method: 'POST' },
+            logout: { method: 'DELETE' }
+        });
+    }]);
+
+});
+define('bazalt-auth/factories/baRoleResource', ['bazalt-auth/app'], function(module) {
+
+    module.factory('baRoleResource', ['$resource', '$q', 'baConfig', function ($resource, $q, baConfig) {
+        return $resource(baConfig.apiEndpoint() + '/role', {}, {
         });
     }]);
 
@@ -247,6 +263,8 @@ define('bazalt-auth/factories/errorHttpInterceptor', ['bazalt-auth/app'], functi
 });
 define('bazalt-auth/factories', [
     'bazalt-auth/factories/baUserResource',
+    'bazalt-auth/factories/baSessionResource',
+    'bazalt-auth/factories/baRoleResource',
     'bazalt-auth/factories/errorHttpInterceptor'
 ], function(angular) {
 });
@@ -258,7 +276,7 @@ define('bazalt-auth/baConfig', ['bazalt-auth/app'], function (module) {
 
         this.$templateUrl = '/views/user';
 
-        this.$apiEndpoint = '/rest.php/user';
+        this.$apiEndpoint = '/rest.php/auth';
 
         this.baseUrl = function (baseUrl) {
             this.$baseUrl = baseUrl;
@@ -395,8 +413,8 @@ define('bazalt-auth/baConfig', ['bazalt-auth/app'], function (module) {
 define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
     'use strict';
 
-    module.factory('baAcl', ['$rootScope', 'baUserResource', 'baConfig', '$cookieStore', '$log',
-                     function($rootScope,   baUserResource,   baConfig,   $cookieStore,   $log) {
+    module.factory('baAcl', ['$rootScope', 'baSessionResource', 'baConfig', '$cookieStore', '$log',
+                     function($rootScope,   baSessionResource,   baConfig,   $cookieStore,   $log) {
         var $user = {
             role: baConfig.roles().public
         },
@@ -415,7 +433,7 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
         };
         $rootScope.user = $user;
         if ($cookieStore.get('user')) {
-            baUserResource.get(function(user) {
+            baSessionResource.get(function(user) {
                 if (user) {
                     changeUser(user);
                 }
@@ -446,7 +464,7 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
             login: function(user, success, error) {
                 success = success || angular.noop;
                 error = error || angular.noop;
-                baUserResource.login(user, function(user) {
+                baSessionResource.login(user, function(user) {
                     changeUser(user);
                     $cookieStore.put('user', user);
                     success(user);
@@ -457,7 +475,7 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
             logout: function(success, error) {
                 success = success || angular.noop;
                 error = error || angular.noop;
-                baUserResource.logout(function(user){
+                baSessionResource.logout(function(user){
                     changeUser(user || {});
                     success(user);
                 }, error);

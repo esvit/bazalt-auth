@@ -1,8 +1,8 @@
 define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
     'use strict';
 
-    module.factory('baAcl', ['$rootScope', 'baUserResource', 'baConfig', '$cookieStore', '$log',
-                     function($rootScope,   baUserResource,   baConfig,   $cookieStore,   $log) {
+    module.factory('baAcl', ['$rootScope', 'baSessionResource', 'baConfig', '$cookieStore', '$log',
+                     function($rootScope,   baSessionResource,   baConfig,   $cookieStore,   $log) {
         var $user = {
             role: baConfig.roles().public
         },
@@ -21,7 +21,7 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
         };
         $rootScope.user = $user;
         if ($cookieStore.get('user')) {
-            baUserResource.get(function(user) {
+            baSessionResource.get(function(user) {
                 if (user) {
                     changeUser(user);
                 }
@@ -52,7 +52,7 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
             login: function(user, success, error) {
                 success = success || angular.noop;
                 error = error || angular.noop;
-                baUserResource.login(user, function(user) {
+                baSessionResource.login(user, function(user) {
                     changeUser(user);
                     $cookieStore.put('user', user);
                     success(user);
@@ -63,7 +63,7 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
             logout: function(success, error) {
                 success = success || angular.noop;
                 error = error || angular.noop;
-                baUserResource.logout(function(user){
+                baSessionResource.logout(function(user){
                     changeUser(user || {});
                     success(user);
                 }, error);
