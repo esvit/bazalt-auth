@@ -6,7 +6,7 @@ define('bazalt-auth/baConfig', ['bazalt-auth/app'], function (module) {
 
         this.$templateUrl = '/views/user';
 
-        this.$apiEndpoint = '/rest.php/user';
+        this.$apiEndpoint = '/rest.php/auth';
 
         this.baseUrl = function (baseUrl) {
             this.$baseUrl = baseUrl;
