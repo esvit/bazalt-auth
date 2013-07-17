@@ -1,7 +1,7 @@
-define('bazalt-auth/blConfig', ['bazalt-auth/app'], function (module) {
+define('bazalt-auth/baConfig', ['bazalt-auth/app'], function (module) {
     'use strict';
 
-    module.provider('blConfig', [function() {
+    module.provider('baConfig', [function() {
         this.$baseUrl = '/user';
 
         this.$templateUrl = '/views/user';
@@ -116,22 +116,27 @@ define('bazalt-auth/blConfig', ['bazalt-auth/app'], function (module) {
             'admin': ['admin']
         }, this.$roles);
     }])
-    .run(['$rootScope', '$location', 'blConfig', 'blAcl',
-  function($rootScope, $location, blConfig, blAcl) {
-        $rootScope.$on("$routeChangeStart", function (event, next, current) {
+    .run(['$rootScope', '$location', 'baConfig', 'baAcl',
+  function($rootScope,   $location,   baConfig,   baAcl) {
+        var setAcl = function() {
             $rootScope.error = null;
 
-            $rootScope.user = blAcl.user();
-            $rootScope.userRoles = blConfig.roles();
-            $rootScope.acl = blConfig.levels();
-
-            if (angular.isDefined(next) && angular.isDefined(next.$$route.access) && !blAcl.authorize(next.$$route.access)) {
-                if (blAcl.isLoggedIn())
+            $rootScope.user = baAcl.user();
+            $rootScope.userRoles = baConfig.roles();
+            $rootScope.acl = baConfig.levels();
+            console.info($rootScope.acl);
+        };
+        $rootScope.$on("$routeChangeStart", function(event, next, current) {
+            setAcl();
+            if (angular.isDefined(next) && angular.isDefined(next.$$route) &&
+                next.$$route.hasOwnProperty('access') && !baAcl.authorize(next.$$route.access)) {
+                if (baAcl.isLoggedIn())
                     $location.path('/');
                 else
-                    $location.path(blConfig.baseUrl() + '/login');
+                    $location.path(baConfig.baseUrl() + '/login');
             }
         });
+        setAcl();
     }]);
 
 });

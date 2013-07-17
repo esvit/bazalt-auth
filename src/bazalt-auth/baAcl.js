@@ -1,26 +1,27 @@
-define('bazalt-auth/blAcl', ['bazalt-auth/app'], function (module) {
+define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
     'use strict';
 
-    module.factory('blAcl', ['$rootScope', 'UserResource', 'blConfig', '$cookieStore', '$log',
-                     function($rootScope,   UserResource,   blConfig,   $cookieStore,   $log) {
+    module.factory('baAcl', ['$rootScope', 'baUserResource', 'baConfig', '$cookieStore', '$log',
+                     function($rootScope,   baUserResource,   baConfig,   $cookieStore,   $log) {
         var $user = {
-            role: blConfig.roles().public
+            role: baConfig.roles().public
         },
         changeUser = function(user) {
             if (user.login) {
-                user.role = blConfig.roles().user;
+                user.role = baConfig.roles().user;
             } else {
-                user.role = blConfig.roles().public;
+                user.role = baConfig.roles().public;
             }
             $user = user;
             $log.info('User login', $user);
+            $rootScope.$emit('baUserLogin', { 'user': $user });
             if (!$rootScope.$$phase) {
                 $rootScope.$apply();
             }
         };
         $rootScope.user = $user;
         if ($cookieStore.get('user')) {
-            UserResource.get(function(user) {
+            baUserResource.get(function(user) {
                 if (user) {
                     changeUser(user);
                 }
@@ -51,7 +52,7 @@ define('bazalt-auth/blAcl', ['bazalt-auth/app'], function (module) {
             login: function(user, success, error) {
                 success = success || angular.noop;
                 error = error || angular.noop;
-                UserResource.login(user, function(user) {
+                baUserResource.login(user, function(user) {
                     changeUser(user);
                     $cookieStore.put('user', user);
                     success(user);
@@ -62,7 +63,7 @@ define('bazalt-auth/blAcl', ['bazalt-auth/app'], function (module) {
             logout: function(success, error) {
                 success = success || angular.noop;
                 error = error || angular.noop;
-                UserResource.logout(function(user){
+                baUserResource.logout(function(user){
                     changeUser(user || {});
                     success(user);
                 }, error);

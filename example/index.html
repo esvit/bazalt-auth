@@ -7,21 +7,22 @@
 </head>
 <body>
 
-<div bl-access-level="acl.anon" class="ng-cloak">
+<div ba-access-level="acl.anon" class="ng-cloak">
     <a href="#!/user/login">Login</a>
     <a href="#!/user/register">Register</a>
 </div>
 
-<div bl-access-level="acl.user" class="ng-cloak">
+<div ba-access-level="acl.user" class="ng-cloak">
     <a href="#!/user/profile">Profile</a>
     <a href="#!/user/logout">Logout</a>
 </div>
 
 <div ng-view></div>
 
-<div bl-access-level="acl.admin" class="ng-cloak">
+<div ba-access-level="acl.admin" class="ng-cloak">
     Test
 </div>
+
 
 </body>
 </html>

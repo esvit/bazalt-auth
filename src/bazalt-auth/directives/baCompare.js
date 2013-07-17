@@ -1,10 +1,10 @@
-define('bazalt-auth/directives/bvCompare', ['bazalt-auth/app'], function(module) {
+define('bazalt-auth/directives/baCompare', ['bazalt-auth/app'], function(module) {
 
-    module.directive('bvCompare', [function () {
+    module.directive('baCompare', [function () {
         return {
             require: 'ngModel',
             scope: {
-                compareField: '=bvCompare'
+                compareField: '=baCompare'
             },
             link: function (scope, elem, attrs, ctrl) {
                 // add a parser that will process each time the value is
@@ -12,7 +12,7 @@ define('bazalt-auth/directives/bvCompare', ['bazalt-auth/app'], function(module)
                 ctrl.$parsers.unshift(function(value) {
                     // test and set the validity after update.
                     var valid = value == scope.compareField;
-                    ctrl.$setValidity('bvCompare', valid);
+                    ctrl.$setValidity('baCompare', valid);
 
                     // if it's valid, return the value to the model,
                     // otherwise return undefined.
@@ -23,7 +23,7 @@ define('bazalt-auth/directives/bvCompare', ['bazalt-auth/app'], function(module)
                 // is updated on the DOM element.
                 ctrl.$formatters.unshift(function(value) {
                     // validate.
-                    ctrl.$setValidity('bvCompare', value == scope.compareField);
+                    ctrl.$setValidity('baCompare', value == scope.compareField);
 
                     // return the value or nothing will be written to the DOM.
                     return value;

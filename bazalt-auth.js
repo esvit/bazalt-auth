@@ -4,23 +4,24 @@ define('bazalt-auth/app', ['jquery', 'angular', 'angular-resource', 'angular-coo
 
     return angular.module('bazalt-auth', ['ngCookies']);
 });
-define('bazalt-auth/controllers/RegisterCtrl', ['bazalt-auth/app'], function(module) {
+define('bazalt-auth/controllers/baRegisterCtrl', ['bazalt-auth/app'], function(module) {
 
-    module.controller('RegisterCtrl', ['$scope', '$location', 'UserResource', 'blConfig', '$q', function($scope, $location, UserResource, blConfig, $q) {
+    module.controller('baRegisterCtrl', ['$scope', '$location', 'baUserResource', 'baConfig', '$q',
+                                 function($scope,   $location,   baUserResource,   baConfig,   $q) {
         $scope.user = {};
         $scope.registerUser = function () {
-            var user = new UserResource($scope.user);
+            var user = new baUserResource($scope.user);
             $scope.loading = true;
             user.$register(function(res) {
                 $scope.loading = false;
-                $location.path(blConfig.baseUrl() + '/activationSent');
+                $location.path(baConfig.baseUrl() + '/activationSent');
             }, function(res) {
                 if (res.status == 400) $scope.register.invalidForm(res.data);
             });
         };
         $scope.checkEmail = function(email) {
             var d = $q.defer();
-            UserResource.checkEmail({ 'email': email }, function(data) {
+            baUserResource.checkEmail({ 'email': email }, function(data) {
                 d.resolve(data.valid);
             }, function(error) {
                 d.reject(error);
@@ -40,18 +41,18 @@ define('bazalt-auth/controllers/RegisterCtrl', ['bazalt-auth/app'], function(mod
     }]);
 
 });
-define('bazalt-auth/controllers/LoginCtrl', ['bazalt-auth/app'], function(module) {
+define('bazalt-auth/controllers/baLoginCtrl', ['bazalt-auth/app'], function(module) {
 
-    module.controller('LoginCtrl', ['$scope', '$location', 'blAcl',
-                            function($scope,   $location,   blAcl) {
+    module.controller('baLoginCtrl', ['$scope', '$location', 'baAcl',
+                              function($scope,   $location,   baAcl) {
         $scope.form = {};
-        if (blAcl.isLoggedIn()) {
+        if (baAcl.isLoggedIn()) {
             $location.path('/user/profile');
         }
 
        $scope.loginUser = function () {
             var data = $scope.form;
-            blAcl.login(data, function(user) {
+            baAcl.login(data, function(user) {
                 $location.path('/user/profile');
             }, function(res) {
                 if (res.status == 400) $scope.login.invalidForm(res.data);
@@ -60,34 +61,91 @@ define('bazalt-auth/controllers/LoginCtrl', ['bazalt-auth/app'], function(module
     }]);
 
 });
-define('bazalt-auth/controllers/LogoutCtrl', ['bazalt-auth/app'], function(module) {
+define('bazalt-auth/controllers/baLogoutCtrl', ['bazalt-auth/app'], function(module) {
 
-    module.controller('LogoutCtrl', ['$scope', '$location', 'blAcl',
-                            function($scope,   $location,   blAcl) {
-        blAcl.logout(function() {
+    module.controller('baLogoutCtrl', ['$scope', '$location', 'baAcl',
+                               function($scope,   $location,   baAcl) {
+        baAcl.logout(function() {
             $location.path('/');
         });
     }]);
 
 });
-define('bazalt-auth/controllers/ModalCtrl', ['bazalt-auth/app'], function(module) {
+define('bazalt-auth/controllers', [
+    'bazalt-auth/controllers/baRegisterCtrl',
+    'bazalt-auth/controllers/baLoginCtrl',
+    'bazalt-auth/controllers/baLogoutCtrl'
+], function(angular) {
+});
+define('bazalt-auth/directives/baCompare', ['bazalt-auth/app'], function(module) {
 
-    module.controller('ModalCtrl', ['$scope', function($scope) {
-        this.setModel = function(data) {
-            $scope.$apply( function() {
-                $scope.data = data;
-            });
-        };
-        $scope.setModel = this.setModel;
+    module.directive('baCompare', [function () {
+        return {
+            require: 'ngModel',
+            scope: {
+                compareField: '=baCompare'
+            },
+            link: function (scope, elem, attrs, ctrl) {
+                // add a parser that will process each time the value is
+                // parsed into the model when the user updates it.
+                ctrl.$parsers.unshift(function(value) {
+                    // test and set the validity after update.
+                    var valid = value == scope.compareField;
+                    ctrl.$setValidity('baCompare', valid);
+
+                    // if it's valid, return the value to the model,
+                    // otherwise return undefined.
+                    return valid ? value : undefined;
+                });
+
+                // add a formatter that will process each time the value
+                // is updated on the DOM element.
+                ctrl.$formatters.unshift(function(value) {
+                    // validate.
+                    ctrl.$setValidity('baCompare', value == scope.compareField);
+
+                    // return the value or nothing will be written to the DOM.
+                    return value;
+                });
+            }
+        }
     }]);
 
 });
-define('bazalt-auth/controllers', [
-    'bazalt-auth/controllers/RegisterCtrl',
-    'bazalt-auth/controllers/LoginCtrl',
-    'bazalt-auth/controllers/LogoutCtrl',
-    'bazalt-auth/controllers/ModalCtrl'
-], function(angular) {
+define('bazalt-auth/directives/baAccessLevel', ['bazalt-auth/app'], function(module) {
+
+    module.directive('baAccessLevel', ['baAcl', '$rootScope',
+                               function(baAcl,   $rootScope) {
+        return {
+            restrict: 'A',
+            scope: {
+                'accessLevel': '=baAccessLevel'
+            },
+            link: function($scope, element, attrs) {
+                console.info(attrs.baAccessLevel, $scope.accessLevel)
+                $scope.user = baAcl.user();
+                $rootScope.$watch('user', function(user) {
+                    updateCSS();
+                }, true);
+                $scope.$watch('accessLevel', function(al) {
+                    updateCSS();
+                }, true);
+                $rootScope.$on('baUserLogin', function(e, args) {
+                    $scope.user = baAcl.user();
+                    updateCSS();
+                    console.info($scope.user,
+                        $scope.accessLevel );
+                });
+
+                function updateCSS() {
+                    if ($scope.user && $scope.accessLevel) {
+                        $(element).toggle(baAcl.authorize($scope.accessLevel, baAcl.user().role) >= 1);
+                    }
+                }
+            }
+        };
+    }]);
+
 });
 define('bazalt-auth/directives/ngUnique', ['bazalt-auth/app'], function(module) {
 
@@ -111,68 +169,6 @@ define('bazalt-auth/directives/ngUnique', ['bazalt-auth/app'], function(module) 
         }
     }
     ]);
-
-});
-define('bazalt-auth/directives/bvCompare', ['bazalt-auth/app'], function(module) {
-
-    module.directive('bvCompare', [function () {
-        return {
-            require: 'ngModel',
-            scope: {
-                compareField: '=bvCompare'
-            },
-            link: function (scope, elem, attrs, ctrl) {
-                // add a parser that will process each time the value is
-                // parsed into the model when the user updates it.
-                ctrl.$parsers.unshift(function(value) {
-                    // test and set the validity after update.
-                    var valid = value == scope.compareField;
-                    ctrl.$setValidity('bvCompare', valid);
-
-                    // if it's valid, return the value to the model,
-                    // otherwise return undefined.
-                    return valid ? value : undefined;
-                });
-
-                // add a formatter that will process each time the value
-                // is updated on the DOM element.
-                ctrl.$formatters.unshift(function(value) {
-                    // validate.
-                    ctrl.$setValidity('bvCompare', value == scope.compareField);
-
-                    // return the value or nothing will be written to the DOM.
-                    return value;
-                });
-            }
-        }
-    }]);
-
-});
-define('bazalt-auth/directives/blAccessLevel', ['bazalt-auth/app'], function(module) {
-
-    module.directive('blAccessLevel', ['blAcl', '$rootScope', function(blAcl, $rootScope) {
-        return {
-            restrict: 'A',
-            scope: {
-                'accessLevel': '=blAccessLevel'
-            },
-            link: function($scope, element, attrs) {
-                $scope.user = blAcl.user();
-                $rootScope.$watch('user', function(user) {
-                    updateCSS();
-                }, true);
-                $scope.$watch('accessLevel', function(al) {
-                    updateCSS();
-                }, true);
-
-                function updateCSS() {
-                    if ($scope.user && $scope.accessLevel) {
-                        $(element).toggle(blAcl.authorize($scope.accessLevel, blAcl.user().role) >= 1);
-                    }
-                }
-            }
-        };
-    }]);
 
 });
 define('bazalt-auth/directives/remoteForm', ['bazalt-auth/app'], function(module) {
@@ -211,18 +207,17 @@ define('bazalt-auth/directives/remoteForm', ['bazalt-auth/app'], function(module
 
 });
 define('bazalt-auth/directives', [
+    'bazalt-auth/directives/baCompare',
+    'bazalt-auth/directives/baAccessLevel',
+
     'bazalt-auth/directives/ngUnique',
-    'bazalt-auth/directives/bvCompare',
-
-    'bazalt-auth/directives/blAccessLevel',
-
     'bazalt-auth/directives/remoteForm'
 ], function(angular) {
 });
-define('bazalt-auth/factories/UserResource', ['bazalt-auth/app'], function(module) {
+define('bazalt-auth/factories/baUserResource', ['bazalt-auth/app'], function(module) {
 
-    module.factory('UserResource', ['$resource', '$q', 'blConfig', function ($resource, $q, blConfig) {
-        return $resource(blConfig.apiEndpoint(), {}, {
+    module.factory('baUserResource', ['$resource', '$q', 'baConfig', function ($resource, $q, baConfig) {
+        return $resource(baConfig.apiEndpoint(), {}, {
             login: { method: 'POST' },
             logout: { method: 'DELETE' },
             checkEmail: { method: 'GET', params: { 'action': 'checkEmail' } },
@@ -251,14 +246,14 @@ define('bazalt-auth/factories/errorHttpInterceptor', ['bazalt-auth/app'], functi
 
 });
 define('bazalt-auth/factories', [
-    'bazalt-auth/factories/UserResource',
+    'bazalt-auth/factories/baUserResource',
     'bazalt-auth/factories/errorHttpInterceptor'
 ], function(angular) {
 });
-define('bazalt-auth/blConfig', ['bazalt-auth/app'], function (module) {
+define('bazalt-auth/baConfig', ['bazalt-auth/app'], function (module) {
     'use strict';
 
-    module.provider('blConfig', [function() {
+    module.provider('baConfig', [function() {
         this.$baseUrl = '/user';
 
         this.$templateUrl = '/views/user';
@@ -373,48 +368,54 @@ define('bazalt-auth/blConfig', ['bazalt-auth/app'], function (module) {
             'admin': ['admin']
         }, this.$roles);
     }])
-    .run(['$rootScope', '$location', 'blConfig', 'blAcl',
-  function($rootScope, $location, blConfig, blAcl) {
-        $rootScope.$on("$routeChangeStart", function (event, next, current) {
+    .run(['$rootScope', '$location', 'baConfig', 'baAcl',
+  function($rootScope,   $location,   baConfig,   baAcl) {
+        var setAcl = function() {
             $rootScope.error = null;
 
-            $rootScope.user = blAcl.user();
-            $rootScope.userRoles = blConfig.roles();
-            $rootScope.acl = blConfig.levels();
-
-            if (angular.isDefined(next) && angular.isDefined(next.$$route.access) && !blAcl.authorize(next.$$route.access)) {
-                if (blAcl.isLoggedIn())
+            $rootScope.user = baAcl.user();
+            $rootScope.userRoles = baConfig.roles();
+            $rootScope.acl = baConfig.levels();
+            console.info($rootScope.acl);
+        };
+        $rootScope.$on("$routeChangeStart", function(event, next, current) {
+            setAcl();
+            if (angular.isDefined(next) && angular.isDefined(next.$$route) &&
+                next.$$route.hasOwnProperty('access') && !baAcl.authorize(next.$$route.access)) {
+                if (baAcl.isLoggedIn())
                     $location.path('/');
                 else
-                    $location.path(blConfig.baseUrl() + '/login');
+                    $location.path(baConfig.baseUrl() + '/login');
             }
         });
+        setAcl();
     }]);
 
 });
-define('bazalt-auth/blAcl', ['bazalt-auth/app'], function (module) {
+define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
     'use strict';
 
-    module.factory('blAcl', ['$rootScope', 'UserResource', 'blConfig', '$cookieStore', '$log',
-                     function($rootScope,   UserResource,   blConfig,   $cookieStore,   $log) {
+    module.factory('baAcl', ['$rootScope', 'baUserResource', 'baConfig', '$cookieStore', '$log',
+                     function($rootScope,   baUserResource,   baConfig,   $cookieStore,   $log) {
         var $user = {
-            role: blConfig.roles().public
+            role: baConfig.roles().public
         },
         changeUser = function(user) {
             if (user.login) {
-                user.role = blConfig.roles().user;
+                user.role = baConfig.roles().user;
             } else {
-                user.role = blConfig.roles().public;
+                user.role = baConfig.roles().public;
             }
             $user = user;
             $log.info('User login', $user);
+            $rootScope.$emit('baUserLogin', { 'user': $user });
             if (!$rootScope.$$phase) {
                 $rootScope.$apply();
             }
         };
         $rootScope.user = $user;
         if ($cookieStore.get('user')) {
-            UserResource.get(function(user) {
+            baUserResource.get(function(user) {
                 if (user) {
                     changeUser(user);
                 }
@@ -445,7 +446,7 @@ define('bazalt-auth/blAcl', ['bazalt-auth/app'], function (module) {
             login: function(user, success, error) {
                 success = success || angular.noop;
                 error = error || angular.noop;
-                UserResource.login(user, function(user) {
+                baUserResource.login(user, function(user) {
                     changeUser(user);
                     $cookieStore.put('user', user);
                     success(user);
@@ -456,7 +457,7 @@ define('bazalt-auth/blAcl', ['bazalt-auth/app'], function (module) {
             logout: function(success, error) {
                 success = success || angular.noop;
                 error = error || angular.noop;
-                UserResource.logout(function(user){
+                baUserResource.logout(function(user){
                     changeUser(user || {});
                     success(user);
                 }, error);
@@ -471,48 +472,48 @@ define('bazalt-auth/blAcl', ['bazalt-auth/app'], function (module) {
 define('bazalt-auth/routes', ['bazalt-auth/app'], function (module) {
     'use strict';
 
-    module.config(['$routeProvider', '$locationProvider', 'blConfigProvider', function($routeProvider, $locationProvider, blConfigProvider) {
-        var baseUrl     = blConfigProvider.$baseUrl,
-            templateUrl = blConfigProvider.$templateUrl;
+    module.config(['$routeProvider', '$locationProvider', 'baConfigProvider', function($routeProvider, $locationProvider, baConfigProvider) {
+        var baseUrl     = baConfigProvider.$baseUrl,
+            templateUrl = baConfigProvider.$templateUrl;
 
         $routeProvider
             // registration routes
             .when(baseUrl + '/register', {
                 templateUrl: templateUrl + '/account/registerForm.html',
-                controller: 'RegisterCtrl'
+                controller: 'baRegisterCtrl'
             })
             .when(baseUrl + '/terms', {
                 templateUrl: templateUrl + '/modals/terms.html',
-                controller: 'ModalCtrl'
+                controller: 'baModalCtrl'
             })
             .when(baseUrl + '/privacy', {
                 templateUrl: templateUrl + '/modals/privacy.html',
-                controller: 'ModalCtrl'
+                controller: 'baModalCtrl'
             })
             .when(baseUrl + '/activationSent', {
                 templateUrl: templateUrl + '/account/registerSuccessMessage.html'
             })
             .when(baseUrl + '/resendActivation', {
                 templateUrl: templateUrl + '/account/resendActivationForm.html',
-                controller: 'RegisterCtrl'
+                controller: 'baRegisterCtrl'
             })
             .when(baseUrl + '/activationResent', {
                 templateUrl: templateUrl + '/account/activationResentMessage.html',
-                controller: 'RegisterCtrl'
+                controller: 'baRegisterCtrl'
             })
             .when(baseUrl + '/activate/:activationKey', {
                 templateUrl: templateUrl + '/account/activationResentMessage.html',
-                controller: 'RegisterCtrl'
+                controller: 'baRegisterCtrl'
             })
 
             // login routes
             .when(baseUrl + '/login', {
                 templateUrl: templateUrl + '/account/loginForm.html',
-                controller: 'LoginCtrl'
+                controller: 'baLoginCtrl'
             })
             .when(baseUrl + '/logout', {
                 template: 'Loading...',
-                controller: 'LogoutCtrl'
+                controller: 'baLogoutCtrl'
             });
     }]);
 
@@ -524,8 +525,8 @@ define('bazalt-auth',
         'bazalt-auth/directives',
         'bazalt-auth/factories',
         'bazalt-auth/app',
-        'bazalt-auth/blConfig',
-        'bazalt-auth/blAcl',
+        'bazalt-auth/baConfig',
+        'bazalt-auth/baAcl',
         'bazalt-auth/routes'
     ], function (angular) {
     'use strict';

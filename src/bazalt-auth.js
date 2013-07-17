@@ -5,8 +5,8 @@ define('bazalt-auth',
         'bazalt-auth/directives',
         'bazalt-auth/factories',
         'bazalt-auth/app',
-        'bazalt-auth/blConfig',
-        'bazalt-auth/blAcl',
+        'bazalt-auth/baConfig',
+        'bazalt-auth/baAcl',
         'bazalt-auth/routes'
     ], function (angular) {
     'use strict';

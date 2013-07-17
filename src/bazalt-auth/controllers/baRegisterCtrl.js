@@ -1,20 +1,21 @@
-define('bazalt-auth/controllers/RegisterCtrl', ['bazalt-auth/app'], function(module) {
+define('bazalt-auth/controllers/baRegisterCtrl', ['bazalt-auth/app'], function(module) {
 
-    module.controller('RegisterCtrl', ['$scope', '$location', 'UserResource', 'blConfig', '$q', function($scope, $location, UserResource, blConfig, $q) {
+    module.controller('baRegisterCtrl', ['$scope', '$location', 'baUserResource', 'baConfig', '$q',
+                                 function($scope,   $location,   baUserResource,   baConfig,   $q) {
         $scope.user = {};
         $scope.registerUser = function () {
-            var user = new UserResource($scope.user);
+            var user = new baUserResource($scope.user);
             $scope.loading = true;
             user.$register(function(res) {
                 $scope.loading = false;
-                $location.path(blConfig.baseUrl() + '/activationSent');
+                $location.path(baConfig.baseUrl() + '/activationSent');
             }, function(res) {
                 if (res.status == 400) $scope.register.invalidForm(res.data);
             });
         };
         $scope.checkEmail = function(email) {
             var d = $q.defer();
-            UserResource.checkEmail({ 'email': email }, function(data) {
+            baUserResource.checkEmail({ 'email': email }, function(data) {
                 d.resolve(data.valid);
             }, function(error) {
                 d.reject(error);
