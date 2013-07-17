@@ -8,7 +8,7 @@ use Tonic\Response;
 /**
  * UserResource
  *
- * @uri /user
+ * @uri /auth/user
  */
 class UserResource extends \Tonic\Resource
 {
@@ -41,10 +41,15 @@ class UserResource extends \Tonic\Resource
     {
         if (isset($_GET['id'])) {
             $user = User::getById($_GET['id']);
+            return new Response(Response::OK, $user->toArray());
         } else {
-            $user = \Bazalt\Auth::getUser();
+            $users = User::getCollection();
+            $result = [];
+            foreach ($users as $user) {
+                $result []= $user->toArray();
+            }
+            return new Response(Response::OK, $result);
         }
-        return new Response(Response::OK, $user->toArray());
     }
 
     /**
