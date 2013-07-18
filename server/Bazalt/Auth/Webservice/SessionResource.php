@@ -8,7 +8,7 @@ use Tonic\Response;
 /**
  * SessionResource
  *
- * @uri /auth/session
+ * @uri /auth/sessions
  */
 class SessionResource extends \Tonic\Resource
 {

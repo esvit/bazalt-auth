@@ -7,11 +7,11 @@ use Bazalt\Data\Validator;
 use Tonic\Response;
 
 /**
- * RoleResource
+ * UsersResource
  *
- * @uri /auth/roles
+ * @uri /auth/users
  */
-class RoleResource extends \Tonic\Resource
+class UsersResource extends \Tonic\Resource
 {
     /**
      * Condition method to turn output into JSON
@@ -36,63 +36,25 @@ class RoleResource extends \Tonic\Resource
 
     /**
      * @method GET
-     * @provides text/javascript
+     * @json
      */
-    public function getRoles()
+    public function getList()
     {
-        $roles = Role::getAll();
-        //$users->page((int)$_GET['page']);
-        //$users->countPerPage((int)$_GET['count']);
+        $users = User::getCollection();
+        $users->page((int)$_GET['page']);
+        $users->countPerPage((int)$_GET['count']);
         $result = [];
-        foreach ($roles as $role) {
-            $result []= $role->toArray();
+        foreach ($users->fetchPage() as $user) {
+            $result []= $user->toArray();
         }
-        $result = json_encode($result);
-        $result = 'define([],function(){return ' . $result . '})';
-        $response = new Response(Response::OK, $result);
-        $response->contentType = "application/json";
-        return $response;
-    }
-
-    /**
-     * @method GET
-     * @provides application/json
-     * @json
-     */
-    public function getUser()
-    {
-        if (isset($_GET['id'])) {
-            $user = User::getById($_GET['id']);
-            return new Response(Response::OK, $user->toArray());
-        } else {
-            $roles = Role::getAll();
-            //$users->page((int)$_GET['page']);
-            //$users->countPerPage((int)$_GET['count']);
-            $result = [];
-            foreach ($roles as $role) {
-                $result []= $role->toArray();
-            }
-            return new Response(Response::OK,[
-                'data' => $result/*,
-                'pager' => [
-                    'current' => $users->page(),
-                    'count'   => $users->getPagesCount(),
-                    'total'   => $users->count(),
-                    'countPerPage'   => $users->countPerPage()
-                ]*/
-            ]);
-        }
-    }
-
-    /**
-     * @method DELETE
-     * @json
-     */
-    public function logout()
-    {
-        \Bazalt\Auth::logout();
-        $user = \Bazalt\Auth::getUser();
-        return new Response(Response::OK, $user->toArray());
+        return new Response(Response::OK,[
+            'data' => $result,
+            'pager' => [
+            'current' => $users->page(),
+            'count'   => $users->getPagesCount(),
+            'total'   => $users->count(),
+            'countPerPage'   => $users->countPerPage()
+        ]]);
     }
 
     /**
@@ -121,6 +83,17 @@ class RoleResource extends \Tonic\Resource
             $isNew = true;
         }
 
+        $userRoles = [];
+        $data->field('roles')->validator('validRoles', function($roles) use (&$userRoles) {
+            foreach ($roles as $role) {
+                $userRoles[$role] = Role::getById($role);
+                if (!$userRoles[$role]) {
+                    return false;
+                }
+            }
+            return true;
+        }, 'Invalid roles');
+
         $data->field('login')->required();
         $data->field('gender')->required();
 
@@ -130,12 +103,20 @@ class RoleResource extends \Tonic\Resource
 
         $user->login = $data->getData('email');
         $user->email = $data->getData('email');
-        $user->firstname = $data->getData('first');
-        $user->lastname = $data->getData('last');
-        $user->password = User::cryptPassword($data->getData('password'));
+        $user->firstname = $data->getData('firstname');
+        $user->secondname = $data->getData('secondname');
+        $user->patronymic = $data->getData('patronymic');
+        if ($isNew) {
+            $user->password = User::cryptPassword($data->getData('password'));
+        }
         $user->gender = $data->getData('gender');
         $user->is_active = $data->getData('is_active');
         $user->save();
+
+        $user->Roles->clearRelations(array_keys($userRoles));
+        foreach ($userRoles as $role) {
+            $user->Roles->add($role, ['site_id' => 6]);
+        }
 
         if ($isNew) {
             // Create the message

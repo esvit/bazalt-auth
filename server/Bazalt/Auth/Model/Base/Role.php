@@ -17,8 +17,8 @@ abstract class Role extends \Bazalt\ORM\Record
     {
         $this->hasColumn('id', 'PUA:int(10)');
         $this->hasColumn('site_id', 'UN:int(10)');
-//        $this->hasColumn('name', 'varchar(255)');
-//        $this->hasColumn('description', 'text');
+        $this->hasColumn('name', 'varchar(255)');
+        $this->hasColumn('description', 'text');
         $this->hasColumn('is_guest', 'U:tinyint(1)|0');
         $this->hasColumn('system_acl', 'U:tinyint(1)|0');
         $this->hasColumn('is_hidden', 'U:tinyint(1)|0');

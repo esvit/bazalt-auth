@@ -168,11 +168,15 @@ class User extends Base\User
         unset($ret['password']);
         unset($ret['session_id']);
         unset($ret['is_god']);
-        $ret['roles'] = array();
+        $ret['roles'] = [];
         foreach ($this->Roles as $role) {
             $ret['roles'][] = $role->id;
         }
         $ret['fullname'] = $this->getName();
+        $ret['is_active'] = $this->is_active == '1';
+        //if ($this->is_deleted) {
+            $ret['is_deleted'] = $this->is_deleted == '1';
+        //}
         return $ret;
     }
 
@@ -363,7 +367,9 @@ class User extends Base\User
     public static function getCollection()
     {
         $q = ORM::select('Bazalt\Auth\Model\User f')
+                ->where('is_deleted = 0')
                 ->orderBy('is_active ASC');
+
         return new \Bazalt\ORM\Collection($q);
     }
 

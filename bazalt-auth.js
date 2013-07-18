@@ -217,9 +217,9 @@ define('bazalt-auth/directives', [
 define('bazalt-auth/factories/baUserResource', ['bazalt-auth/app'], function(module) {
 
     module.factory('baUserResource', ['$resource', '$q', 'baConfig', function ($resource, $q, baConfig) {
-        return $resource(baConfig.apiEndpoint() + '/user', {}, {
-            checkEmail: { method: 'GET', params: { 'action': 'checkEmail' } },
-            register: { method: 'PUT' }
+        return $resource(baConfig.apiEndpoint() + '/users/:id', { 'id': '@id' }, {
+            'checkEmail': { method: 'GET', params: { 'action': 'checkEmail' } },
+            'delete': { method: 'DELETE' }
         });
     }]);
 
@@ -227,7 +227,7 @@ define('bazalt-auth/factories/baUserResource', ['bazalt-auth/app'], function(mod
 define('bazalt-auth/factories/baSessionResource', ['bazalt-auth/app'], function(module) {
 
     module.factory('baSessionResource', ['$resource', '$q', 'baConfig', function ($resource, $q, baConfig) {
-        return $resource(baConfig.apiEndpoint() + '/session', {}, {
+        return $resource(baConfig.apiEndpoint() + '/sessions', {}, {
             login: { method: 'POST' },
             logout: { method: 'DELETE' }
         });
@@ -237,7 +237,7 @@ define('bazalt-auth/factories/baSessionResource', ['bazalt-auth/app'], function(
 define('bazalt-auth/factories/baRoleResource', ['bazalt-auth/app'], function(module) {
 
     module.factory('baRoleResource', ['$resource', '$q', 'baConfig', function ($resource, $q, baConfig) {
-        return $resource(baConfig.apiEndpoint() + '/role', {}, {
+        return $resource(baConfig.apiEndpoint() + '/roles/:id', { 'id': '@id' }, {
         });
     }]);
 
