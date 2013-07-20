@@ -118,28 +118,20 @@ define('bazalt-auth/directives/baAccessLevel', ['bazalt-auth/app'], function(mod
                                function(baAcl,   $rootScope) {
         return {
             restrict: 'A',
-            scope: {
-                'accessLevel': '=baAccessLevel'
-            },
+            scope: false,
             link: function($scope, element, attrs) {
-                console.info(attrs.baAccessLevel, $scope.accessLevel)
                 $scope.user = baAcl.user();
                 $rootScope.$watch('user', function(user) {
-                    updateCSS();
-                }, true);
-                $scope.$watch('accessLevel', function(al) {
                     updateCSS();
                 }, true);
                 $rootScope.$on('baUserLogin', function(e, args) {
                     $scope.user = baAcl.user();
                     updateCSS();
-                    console.info($scope.user,
-                        $scope.accessLevel );
                 });
 
                 function updateCSS() {
-                    if ($scope.user && $scope.accessLevel) {
-                        $(element).toggle(baAcl.authorize($scope.accessLevel, baAcl.user().role) >= 1);
+                    if ($scope.user) {
+                        $(element).toggle(baAcl.hasRight(attrs.baAccessLevel, baAcl.user().acl));
                     }
                 }
             }
@@ -186,16 +178,18 @@ define('bazalt-auth/directives/remoteForm', ['bazalt-auth/app'], function(module
 
             'link': function (scope, element, attrs, ctrl) {
                 ctrl.invalidForm = function(data) {
+                    ctrl.$setDirty();
                     $log.error(data);
                     angular.forEach(data, function(field, fieldName) {
                         var ctr = ctrl[fieldName] || null;
                         if (!ctr) {
                             $log.error('Field not found', fieldName);
-                        } 
+                        }
                         angular.forEach(field, function(error, validator) {
                             if (!ctr) {
-                                $log.error(error);
+                                $log.error(ctr, error);
                             } else {
+                                ctr.$dirty = true;
                                 ctr.$setValidity(validator, false);
                             }
                         });
@@ -293,6 +287,11 @@ define('bazalt-auth/baConfig', ['bazalt-auth/app'], function (module) {
             return this;
         };
 
+        this.acl = function (levels) {
+            this.$levels = levels;
+            return this;
+        };
+
         this.$get = function() {
             var self = this;
             return {
@@ -373,18 +372,17 @@ define('bazalt-auth/baConfig', ['bazalt-auth/app'], function (module) {
             return accessLevels;
         }
 
-        this.$roles = this.$buildRoles([
-            'public',
-            'user',
-            'admin'
-        ]);
-
-        this.$levels = this.$buildAccessLevels({
+        this.$levels = {
+            'system': {
+                'guest': 1
+            }
+        };
+        /*this.$buildAccessLevels({
             'public': "*",
             'anon': ['public'],
             'user': ['user', 'admin'],
             'admin': ['admin']
-        }, this.$roles);
+        });*/
     }])
     .run(['$rootScope', '$location', 'baConfig', 'baAcl',
   function($rootScope,   $location,   baConfig,   baAcl) {
@@ -394,12 +392,11 @@ define('bazalt-auth/baConfig', ['bazalt-auth/app'], function (module) {
             $rootScope.user = baAcl.user();
             $rootScope.userRoles = baConfig.roles();
             $rootScope.acl = baConfig.levels();
-            console.info($rootScope.acl);
         };
         $rootScope.$on("$routeChangeStart", function(event, next, current) {
             setAcl();
             if (angular.isDefined(next) && angular.isDefined(next.$$route) &&
-                next.$$route.hasOwnProperty('access') && !baAcl.authorize(next.$$route.access)) {
+                next.$$route.hasOwnProperty('access') && !baAcl.hasRight(next.$$route.access)) {
                 if (baAcl.isLoggedIn())
                     $location.path('/');
                 else
@@ -416,13 +413,13 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
     module.factory('baAcl', ['$rootScope', 'baSessionResource', 'baConfig', '$cookieStore', '$log',
                      function($rootScope,   baSessionResource,   baConfig,   $cookieStore,   $log) {
         var $user = {
-            role: baConfig.roles().public
+            acl: {
+                guest: 1
+            }
         },
         changeUser = function(user) {
-            if (user.login) {
-                user.role = baConfig.roles().user;
-            } else {
-                user.role = baConfig.roles().public;
+            if (!user.acl) {
+                user.acl = {};
             }
             $user = user;
             $log.info('User login', $user);
@@ -441,14 +438,22 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
         }
 
         return {
-            authorize: function(accessLevel, role) {
-                if (angular.isUndefined(accessLevel)) {
-                    return true;
+            hasRight: function(accessLevel, role) {
+                var levels = baConfig.levels(),
+                    level = accessLevel.split('.'),
+                    bit = levels;
+                role = role || $user.acl;
+                for (var i = 0; i < level.length; i++) {
+                    if (!bit[level[i]]) {
+                        $log.error('Role "' + accessLevel + '" not found');
+                        return false;
+                    }
+                    bit = bit[level[i]];
                 }
-                if(role === undefined)
-                    role = $user.role;
-
-                return accessLevel.bitMask & role.bitMask;
+                if (!role[level[0]]) {
+                    return false;
+                }
+                return (bit & role[level[0]]) >= 1;
             },
             isLoggedIn: function(user) {
                 if(user === undefined)

@@ -41,3 +41,19 @@ $connectionString = new \Bazalt\ORM\Adapter\Mysql([
 \Bazalt\ORM\Connection\Manager::add($connectionString, 'default');
 
 \Bazalt\Session::setTimeout(30 * 24 * 60 * 60);
+
+class Blog implements \Bazalt\Auth\Acl\Container
+{
+    const ACL_CAN_WRITE_BLOG = 1;
+
+    public function getAclLevels()
+    {
+        return [
+            'can_write_blog' => self::ACL_CAN_WRITE_BLOG
+        ];
+    }
+}
+
+\Bazalt\Auth::registerContainers([
+    'blog' => new Blog()
+]);

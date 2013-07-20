@@ -23,6 +23,11 @@ define('bazalt-auth/baConfig', ['bazalt-auth/app'], function (module) {
             return this;
         };
 
+        this.acl = function (levels) {
+            this.$levels = levels;
+            return this;
+        };
+
         this.$get = function() {
             var self = this;
             return {
@@ -103,18 +108,17 @@ define('bazalt-auth/baConfig', ['bazalt-auth/app'], function (module) {
             return accessLevels;
         }
 
-        this.$roles = this.$buildRoles([
-            'public',
-            'user',
-            'admin'
-        ]);
-
-        this.$levels = this.$buildAccessLevels({
+        this.$levels = {
+            'system': {
+                'guest': 1
+            }
+        };
+        /*this.$buildAccessLevels({
             'public': "*",
             'anon': ['public'],
             'user': ['user', 'admin'],
             'admin': ['admin']
-        }, this.$roles);
+        });*/
     }])
     .run(['$rootScope', '$location', 'baConfig', 'baAcl',
   function($rootScope,   $location,   baConfig,   baAcl) {
@@ -124,12 +128,11 @@ define('bazalt-auth/baConfig', ['bazalt-auth/app'], function (module) {
             $rootScope.user = baAcl.user();
             $rootScope.userRoles = baConfig.roles();
             $rootScope.acl = baConfig.levels();
-            console.info($rootScope.acl);
         };
         $rootScope.$on("$routeChangeStart", function(event, next, current) {
             setAcl();
             if (angular.isDefined(next) && angular.isDefined(next.$$route) &&
-                next.$$route.hasOwnProperty('access') && !baAcl.authorize(next.$$route.access)) {
+                next.$$route.hasOwnProperty('access') && !baAcl.hasRight(next.$$route.access)) {
                 if (baAcl.isLoggedIn())
                     $location.path('/');
                 else

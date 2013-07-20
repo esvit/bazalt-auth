@@ -4,13 +4,13 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
     module.factory('baAcl', ['$rootScope', 'baSessionResource', 'baConfig', '$cookieStore', '$log',
                      function($rootScope,   baSessionResource,   baConfig,   $cookieStore,   $log) {
         var $user = {
-            role: baConfig.roles().public
+            acl: {
+                guest: 1
+            }
         },
         changeUser = function(user) {
-            if (user.login) {
-                user.role = baConfig.roles().user;
-            } else {
-                user.role = baConfig.roles().public;
+            if (!user.acl) {
+                user.acl = {};
             }
             $user = user;
             $log.info('User login', $user);
@@ -29,14 +29,22 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
         }
 
         return {
-            authorize: function(accessLevel, role) {
-                if (angular.isUndefined(accessLevel)) {
-                    return true;
+            hasRight: function(accessLevel, role) {
+                var levels = baConfig.levels(),
+                    level = accessLevel.split('.'),
+                    bit = levels;
+                role = role || $user.acl;
+                for (var i = 0; i < level.length; i++) {
+                    if (!bit[level[i]]) {
+                        $log.error('Role "' + accessLevel + '" not found');
+                        return false;
+                    }
+                    bit = bit[level[i]];
                 }
-                if(role === undefined)
-                    role = $user.role;
-
-                return accessLevel.bitMask & role.bitMask;
+                if (!role[level[0]]) {
+                    return false;
+                }
+                return (bit & role[level[0]]) >= 1;
             },
             isLoggedIn: function(user) {
                 if(user === undefined)

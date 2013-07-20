@@ -4,10 +4,33 @@ namespace Bazalt;
 
 class Auth
 {
+    const ACL_GUEST = 1;
+
+    const ACL_CAN_LOGIN = 2;
+
     /**
      * @var \Bazalt\Auth\Model\User
      */
     protected static $currentUser = null;
+
+    protected static $containers = [
+        'system' => [
+            'guest' => self::ACL_GUEST,
+            'can_login' => self::ACL_CAN_LOGIN
+        ]
+    ];
+
+    public static function registerContainers($containers)
+    {
+        foreach ($containers as $name => $container) {
+            self::$containers[$name] = $container->getAclLevels();
+        }
+    }
+
+    public static function getAclLevels()
+    {
+        return self::$containers;
+    }
 
     public static function getUser()
     {

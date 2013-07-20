@@ -169,8 +169,12 @@ class User extends Base\User
         unset($ret['session_id']);
         unset($ret['is_god']);
         $ret['roles'] = [];
+        $ret['acl'] = [
+            'system' => \Bazalt\Auth::ACL_GUEST
+        ];
         foreach ($this->Roles as $role) {
             $ret['roles'][] = $role->id;
+            $ret['acl']['system'] |= (int)$role->system_acl;
         }
         $ret['fullname'] = $this->getName();
         $ret['is_active'] = $this->is_active == '1';
