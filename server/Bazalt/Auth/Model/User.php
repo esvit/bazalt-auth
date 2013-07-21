@@ -51,9 +51,8 @@ class User extends Base\User
      */
     public static function getByIdAndSession($id, $sessionId = null)
     {
-        $q = ORM::select('Bazalt\Auth\Model\User u');
-                //->leftJoin('Bazalt\Auth\Model\SiteRefUser ref', array('user_id', 'u.id'))
-                //->where('ref.user_id = ?', $id)
+        $q = ORM::select('Bazalt\Auth\Model\User u')
+                ->where('u.id = ?', $id);
                 //->andWhere('ref.site_id = ?', CMS\Bazalt::getSiteID());
 
         if ($sessionId != null) {
@@ -101,19 +100,19 @@ class User extends Base\User
     
     public function getRoles()
     {
-        $splitRoles = CMS\Option::get(CMS\User::SPLIT_ROLES_OPTION, true);
-        if ($splitRoles) {
+        //$splitRoles = CMS\Option::get(CMS\User::SPLIT_ROLES_OPTION, true);
+        //if ($splitRoles) {
             $q = $this->Roles->getQuery();
-            $q->andWhere('ref.site_id = ?', CMS\Bazalt::getSiteId());
+            //$q->andWhere('ref.site_id = ?', CMS\Bazalt::getSiteId());
             return $q->fetchAll();
-        } else {
+        /*} else {
             $roles = Role::getGuestRoles();
             $currentRole = CMS\User::getCurrentRole();
             if($currentRole) {
                 $roles []= $currentRole;
             }
             return $roles;
-        }
+        }*/
     }
 
     /**
@@ -169,9 +168,7 @@ class User extends Base\User
         unset($ret['session_id']);
         unset($ret['is_god']);
         $ret['roles'] = [];
-        $ret['acl'] = [
-            'system' => \Bazalt\Auth::ACL_GUEST
-        ];
+        $ret['acl'] = \Bazalt\Auth::getUserLevels($this);
         foreach ($this->Roles as $role) {
             $ret['roles'][] = $role->id;
             $ret['acl']['system'] |= (int)$role->system_acl;

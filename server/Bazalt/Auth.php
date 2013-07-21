@@ -8,28 +8,48 @@ class Auth
 
     const ACL_CAN_LOGIN = 2;
 
+    const ACL_CAN_MANAGE = 4;
+
     /**
      * @var \Bazalt\Auth\Model\User
      */
     protected static $currentUser = null;
 
-    protected static $containers = [
-        'system' => [
-            'guest' => self::ACL_GUEST,
-            'can_login' => self::ACL_CAN_LOGIN
-        ]
-    ];
+    protected static $containers = [];
 
     public static function registerContainers($containers)
     {
-        foreach ($containers as $name => $container) {
-            self::$containers[$name] = $container->getAclLevels();
+        self::$containers = $containers;
+    }
+
+    public static function getUserLevels(Auth\Model\User $user)
+    {
+        $roles = $user->getRoles();
+        $levels = [
+            'system' => $user->isGuest() ? \Bazalt\Auth::ACL_GUEST : \Bazalt\Auth::ACL_CAN_LOGIN
+        ];
+        foreach ($roles as $role) {
+            $levels['system'] |= $role->system_acl;
         }
+        foreach (self::$containers as $name => $container) {
+            $container->getUserLevels($user, $levels);
+        }
+        return $levels;
     }
 
     public static function getAclLevels()
     {
-        return self::$containers;
+        $levels = [
+            'system' => [
+                'guest' => self::ACL_GUEST,
+                'can_login' => self::ACL_CAN_LOGIN,
+                'can_manage' => self::ACL_CAN_MANAGE
+            ]
+        ];
+        foreach (self::$containers as $name => $container) {
+            $levels[$name] = $container->getAclLevels();
+        }
+        return $levels;
     }
 
     public static function getUser()
