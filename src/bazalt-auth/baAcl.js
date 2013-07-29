@@ -20,7 +20,8 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
             }
         };
         $rootScope.user = $user;
-        if ($cookieStore.get('user')) {
+        if ($cookieStore.get('baAuthUser')) {
+            $user = $cookieStore.get('baAuthUser');
             baSessionResource.get(function(user) {
                 if (user) {
                     changeUser(user);
@@ -62,7 +63,7 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
                 error = error || angular.noop;
                 baSessionResource.login(user, function(user) {
                     changeUser(user);
-                    $cookieStore.put('user', user);
+                    $cookieStore.put('baAuthUser', user);
                     success(user);
                 }, function(res) {
                     error(res);
@@ -72,6 +73,7 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
                 success = success || angular.noop;
                 error = error || angular.noop;
                 baSessionResource.logout(function(user){
+                    $cookieStore.put('baAuthUser', null);
                     changeUser(user || {});
                     success(user);
                 }, error);
