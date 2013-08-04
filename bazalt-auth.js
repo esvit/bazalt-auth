@@ -429,7 +429,8 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
             }
         };
         $rootScope.user = $user;
-        if ($cookieStore.get('user')) {
+        if ($cookieStore.get('baAuthUser')) {
+            $user = $cookieStore.get('baAuthUser');
             baSessionResource.get(function(user) {
                 if (user) {
                     changeUser(user);
@@ -471,7 +472,7 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
                 error = error || angular.noop;
                 baSessionResource.login(user, function(user) {
                     changeUser(user);
-                    $cookieStore.put('user', user);
+                    $cookieStore.put('baAuthUser', user);
                     success(user);
                 }, function(res) {
                     error(res);
@@ -481,6 +482,7 @@ define('bazalt-auth/baAcl', ['bazalt-auth/app'], function (module) {
                 success = success || angular.noop;
                 error = error || angular.noop;
                 baSessionResource.logout(function(user){
+                    $cookieStore.put('baAuthUser', null);
                     changeUser(user || {});
                     success(user);
                 }, error);
@@ -496,42 +498,41 @@ define('bazalt-auth/routes', ['bazalt-auth/app'], function (module) {
     'use strict';
 
     module.config(['$routeProvider', '$locationProvider', 'baConfigProvider', function($routeProvider, $locationProvider, baConfigProvider) {
-        var baseUrl     = baConfigProvider.$baseUrl,
-            templateUrl = baConfigProvider.$templateUrl;
+        var baseUrl     = baConfigProvider.$baseUrl;
 
         $routeProvider
             // registration routes
             .when(baseUrl + '/register', {
-                templateUrl: templateUrl + '/account/registerForm.html',
+                templateUrl: function(){ return baConfigProvider.$templateUrl + '/account/registerForm.html'; },
                 controller: 'baRegisterCtrl'
             })
             .when(baseUrl + '/terms', {
-                templateUrl: templateUrl + '/modals/terms.html',
+                templateUrl: function(){ return baConfigProvider.$templateUrl + '/modals/terms.html'; },
                 controller: 'baModalCtrl'
             })
             .when(baseUrl + '/privacy', {
-                templateUrl: templateUrl + '/modals/privacy.html',
+                templateUrl: function(){ return baConfigProvider.$templateUrl + '/modals/privacy.html'; },
                 controller: 'baModalCtrl'
             })
             .when(baseUrl + '/activationSent', {
-                templateUrl: templateUrl + '/account/registerSuccessMessage.html'
+                templateUrl: function(){ return baConfigProvider.$templateUrl + '/account/registerSuccessMessage.html'; }
             })
             .when(baseUrl + '/resendActivation', {
-                templateUrl: templateUrl + '/account/resendActivationForm.html',
+                templateUrl: function(){ return baConfigProvider.$templateUrl + '/account/resendActivationForm.html'; },
                 controller: 'baRegisterCtrl'
             })
             .when(baseUrl + '/activationResent', {
-                templateUrl: templateUrl + '/account/activationResentMessage.html',
+                templateUrl: function(){ return baConfigProvider.$templateUrl + '/account/activationResentMessage.html'; },
                 controller: 'baRegisterCtrl'
             })
             .when(baseUrl + '/activate/:activationKey', {
-                templateUrl: templateUrl + '/account/activationResentMessage.html',
+                templateUrl: function(){ return baConfigProvider.$templateUrl + '/account/activationResentMessage.html'; },
                 controller: 'baRegisterCtrl'
             })
 
             // login routes
             .when(baseUrl + '/login', {
-                templateUrl: templateUrl + '/account/loginForm.html',
+                templateUrl: function(){ return baConfigProvider.$templateUrl + '/account/loginForm.html'; },
                 controller: 'baLoginCtrl'
             })
             .when(baseUrl + '/logout', {
