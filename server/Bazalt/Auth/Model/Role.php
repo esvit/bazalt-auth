@@ -22,6 +22,14 @@ class Role extends Base\Role
         return $q->fetchAll();
     }
 
+    public static function getGuestRoles()
+    {
+        $q = ORM::select('Bazalt\Auth\Model\Role r')
+            ->where('is_guest = ?', 1);
+
+        return $q->fetchAll();
+    }
+
     public function getByName($name)
     {
         $q = ORM::select('Role r')

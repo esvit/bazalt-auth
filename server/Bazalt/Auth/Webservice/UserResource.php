@@ -68,13 +68,13 @@ class UserResource extends \Tonic\Resource
      */
     public function saveUser()
     {
-        $data = new Validator((array)$this->request->data);
+        $data = Validator::create((array)$this->request->data);
 
         $emailField = $data->field('email')->required()->email();
 
         $isNew = false;
-        if ($data->getData('id')) {
-            $user = User::getById($data->getData('id'));
+        if ($data['id']) {
+            $user = User::getById($data['id']);
             if (!$user) {
                 return new Response(400, ['id' => 'User not found']);
             }
@@ -106,17 +106,17 @@ class UserResource extends \Tonic\Resource
             return new Response(400, $data->errors());
         }
 
-        $user->login = $data->getData('email');
-        $user->email = $data->getData('email');
-        $user->firstname = $data->getData('firstname');
-        $user->secondname = $data->getData('secondname');
-        $user->patronymic = $data->getData('patronymic');
+        $user->login = $data['login'];
+        $user->email = $data['email'];
+        $user->firstname = $data['firstname'];
+        $user->secondname = $data['secondname'];
+        $user->patronymic = $data['patronymic'];
         if ($isNew) {
-            $user->password = User::cryptPassword($data->getData('password'));
+            $user->password = User::cryptPassword($data['password']);
         }
-        $user->gender = $data->getData('gender');
-        $user->is_active = $data->getData('is_active');
-        $user->is_deleted = $data->getData('is_deleted');
+        $user->gender = $data['gender'];
+        $user->is_active = $data['is_active'];
+        $user->is_deleted = $data['is_deleted'];
         $user->save();
 
         $user->Roles->clearRelations(array_keys($userRoles));
