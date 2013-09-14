@@ -8,8 +8,8 @@ env:
   - APPLICATION_ENV="testing" DB="mysql" DB_USERNAME="root"
 
 before_install:
-  - mysql -u$DB_USERNAME -e 'create database tests;'
-  - mysql -u$DB_USERNAME tests < install.sql
+  - mysql -u$DB_USERNAME -e 'create database bazalt_cms;'
+  - mysql -u$DB_USERNAME bazalt_cms < install.sql
   - echo "USE mysql;\nUPDATE user SET password=PASSWORD('awdawd') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
 
 before_script:
