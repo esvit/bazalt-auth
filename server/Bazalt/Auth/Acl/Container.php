@@ -6,5 +6,5 @@ interface Container
 {
     public function getAclLevels();
 
-    public function getUserLevels(\Bazalt\Auth\Model\User $user, &$levels);
+    public function fillUserLevels(\Bazalt\Auth\Model\User $user);
 }

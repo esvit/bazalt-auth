@@ -6,7 +6,7 @@ abstract class Role extends \Bazalt\ORM\Record
 {
     const TABLE_NAME = 'cms_roles';
 
-    const MODEL_NAME = 'Bazalt\Auth\Model\Role';
+    const MODEL_NAME = 'Bazalt\\Auth\\Model\\Role';
 
     public function __construct()
     {
@@ -17,7 +17,7 @@ abstract class Role extends \Bazalt\ORM\Record
     {
         $this->hasColumn('id', 'PUA:int(10)');
         $this->hasColumn('site_id', 'UN:int(10)');
-        $this->hasColumn('name', 'varchar(255)');
+        $this->hasColumn('title', 'varchar(255)');
         $this->hasColumn('description', 'text');
         $this->hasColumn('is_guest', 'U:tinyint(1)|0');
         $this->hasColumn('system_acl', 'U:tinyint(1)|0');
@@ -26,14 +26,6 @@ abstract class Role extends \Bazalt\ORM\Record
 
     public function initRelations()
     {
-        $this->hasRelation('Users', new \Bazalt\ORM\Relation\Many2Many('Bazalt\Auth\Model\User', 'user_id', 'Bazalt\Auth\Model\RoleRefUser', 'role_id'));
-    }
-
-    public function initPlugins()
-    {
-        /*$this->hasPlugin('CMS_ORM_Localizable', array(
-            'fields' => array('name', 'description'),
-            'type' => CMS_ORM_Localizable::ROWS_LOCALIZABLE
-        ));*/
+        $this->hasRelation('Users', new \Bazalt\ORM\Relation\Many2Many('Bazalt\\Auth\\Model\\User', 'user_id', 'Bazalt\\Auth\\Model\\RoleRefUser', 'role_id'));
     }
 }

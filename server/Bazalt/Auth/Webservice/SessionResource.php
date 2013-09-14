@@ -8,7 +8,7 @@ use Bazalt\Rest\Response;
 /**
  * SessionResource
  *
- * @uri /auth/sessions
+ * @uri /auth/session
  */
 class SessionResource extends \Bazalt\Rest\Resource
 {
@@ -49,8 +49,11 @@ class SessionResource extends \Bazalt\Rest\Resource
      */
     public function logout()
     {
-        \Bazalt\Auth::logout();
         $user = \Bazalt\Auth::getUser();
-        return new Response(Response::OK, $user->toArray());
+        if ($user->isGuest()) {
+            return new Response(Response::OK, false);
+        }
+        \Bazalt\Auth::logout();
+        return new Response(Response::OK, true);
     }
 }

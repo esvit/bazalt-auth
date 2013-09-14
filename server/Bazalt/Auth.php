@@ -4,60 +4,22 @@ namespace Bazalt;
 
 class Auth
 {
-    const ACL_GUEST = 1;
-
-    const ACL_CAN_LOGIN = 2;
-
-    const ACL_CAN_MANAGE = 4;
-
     /**
      * @var \Bazalt\Auth\Model\User
      */
     protected static $currentUser = null;
 
-    protected static $containers = [];
-
-    public static function registerContainers($containers)
-    {
-        self::$containers = $containers;
-    }
-
-    public static function getUserLevels(Auth\Model\User $user)
-    {
-        $roles = $user->getRoles();
-        $levels = [
-            'system' => $user->isGuest() ? \Bazalt\Auth::ACL_GUEST : \Bazalt\Auth::ACL_CAN_LOGIN
-        ];
-        foreach ($roles as $role) {
-            $levels['system'] |= $role->system_acl;
-        }
-        foreach (self::$containers as $name => $container) {
-            $container->getUserLevels($user, $levels);
-        }
-        return $levels;
-    }
-
-    public static function getAclLevels()
-    {
-        $levels = [
-            'system' => [
-                'guest' => self::ACL_GUEST,
-                'can_login' => self::ACL_CAN_LOGIN,
-                'can_manage' => self::ACL_CAN_MANAGE
-            ]
-        ];
-        foreach (self::$containers as $name => $container) {
-            $levels[$name] = $container->getAclLevels();
-        }
-        return $levels;
-    }
-
+    /**
+     * Return current user
+     *
+     * @return Auth\Model\Guest|Auth\Model\User
+     */
     public static function getUser()
     {
-        $session = new \Bazalt\Session('auth');
+        $session = new Session('auth');
 
-        if (!self::$currentUser && $session->cmsUser) {
-            $user = Auth\Model\User::getByIdAndSession((int)$session->cmsUser, $session->getSessionId());
+        if (!self::$currentUser && $session->user_id) {
+            $user = Auth\Model\User::getByIdAndSession((int)$session->user_id, Session::getSessionId());
 
             if ($user && ($_COOKIE['authorization_token'] == $session->authorization_token)) {
                 self::$currentUser = $user;
@@ -74,32 +36,18 @@ class Auth
         }
 
         if (!self::$currentUser) {
-            self::$currentUser = self::getGuest();
+            self::$currentUser = Auth\Model\Guest::create(Session::getSessionId());
         }
         return self::$currentUser;
-    }
-
-    public static function getGuest()
-    {
-        $session = new \Bazalt\Session('auth');
-        if (isset($_COOKIE['GuestId'])) {
-            $guestId = $_COOKIE['GuestId'];
-        } else {
-            $guestId = $session->getSessionId();
-            self::setGuestId($guestId);
-        }
-
-        $guest = Auth\Model\Guest::getUser($guestId, $session->getSessionId());
-        return $guest;
     }
 
     public static function setUser(Auth\Model\User $user, $remember = false)
     {
         if (!$user->is_active) {
-            return self::getGuest();
+            return Auth\Model\Guest::create(Session::getSessionId());
         }
-        $session = new \Bazalt\Session('auth');
-        $session->regenerateSessionId();
+        $session = new Session('auth');
+        Session::regenerateSessionId();
         self::$currentUser = $user;
 
         /* if (!$user->hasRight(null, Bazalt::ACL_CAN_LOGIN)) {
@@ -107,41 +55,37 @@ class Auth
              return null;
          }*/
 
-        $user->session_id = $session->getSessionId();
+        $user->session_id = Session::getSessionId();
         $user->updateLastActivity();
 
-        self::setGuestId($user->session_id);
-
         $token = $user->getAuthorizationToken();
-        $session->cmsUser = $user->id;
+        $session->user_id = $user->id;
         $session->authorization_token = $token;
 
         $lifetime = $remember ? (time() + self::getUserSessionLifetime()) : 0;
 
         $_COOKIE['authorization_token'] = $token;
 
-        setcookie('authorization_token', $_COOKIE['authorization_token'], $lifetime, '/', null, false, true);
+        if (!TESTING_STAGE) {
+            setcookie('authorization_token', $_COOKIE['authorization_token'], $lifetime, '/', null, false, true);
+        }
         return $user;
     }
 
     public static function logout()
     {
         $_COOKIE['authorization_token'] = null;
-        setcookie('authorization_token', '', time() - 3600, '/', null, false, false);
+        if (!TESTING_STAGE) {
+            setcookie('authorization_token', '', time() - 3600, '/', null, false, false);
+        }
 
-        $session = new \Bazalt\Session('cms');
+        $session = new Session('auth');
         self::$currentUser = null;
-        unset($session->cmsUser);
+        unset($session->user_id);
         unset($session->authorization_token);
         unset($session->currentRoleId);
         $session->destroy();
-        $session->regenerateSessionId();
-    }
-
-    protected static function setGuestId($guestId)
-    {
-        $_COOKIE['GuestId'] = $guestId;
-        setcookie('GuestId', $guestId, (time() + self::getUserSessionLifetime()), '/', null, false, false);
+        Session::regenerateSessionId();
     }
 
     public static function getUserSessionLifetime()

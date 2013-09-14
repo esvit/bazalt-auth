@@ -11,7 +11,7 @@ class User extends Base\User
 
     protected $systemAcl = null;
 
-    protected $componentsAcl = array();
+    protected $levels = [];
     
     protected $timeOffset = null;
 
@@ -23,9 +23,13 @@ class User extends Base\User
         return $user;
     }
 
-    public function hasName()
+    public function levels($levels = null)
     {
-        return true;
+        if ($levels !== null) {
+            $this->levels = $levels;
+            return $this;
+        }
+        return $this->levels;
     }
 
     public function getTimeOffset()
@@ -168,7 +172,7 @@ class User extends Base\User
         unset($ret['session_id']);
         unset($ret['is_god']);
         $ret['roles'] = [];
-        $ret['acl'] = \Bazalt\Auth::getUserLevels($this);
+//        $ret['acl'] = \Bazalt\Auth::getUserLevels($this);
         foreach ($this->Roles as $role) {
             $ret['roles'][] = $role->id;
             $ret['acl']['system'] |= (int)$role->system_acl;

@@ -4,28 +4,13 @@ namespace Bazalt\Auth\Model;
 use Bazalt\ORM,
     Bazalt\Session;
 
-class Guest extends User
+class Guest extends \stdClass
 {
-    protected $hasName = true;
-
-    public static function getUser($id, $sessionId)
+    public static function create($sessionId)
     {
         $user = new Guest();
-        $user->id = $user->setting('id') ? $user->setting('id') : $sessionId;
-        $user->login = $user->setting('login') ? $user->setting('login') : null;
-        $user->firstname = $user->setting('firstname');
-        $user->password = $user->setting('password');
-
-        if (empty($user->firstname)) {
-            $user->firstname = '';//__('Guest', 'CMS');
-            $user->hasName = false;
-        }
-        if (empty($user->password)) {
-            //$user->password = CMS\User::generateRandomPassword();
-//            $user->setting('password', $user->password);
-        }
-        //$user->password = CMS\User::criptPassword($user->password);
-        $user->session_id = $sessionId;
+        $user->guest_id = $sessionId;
+        $user->is_guest = true;
 
         return $user;
     }
@@ -43,14 +28,6 @@ class Guest extends User
     public function getRoles()
     {
         return Role::getGuestRoles();
-    }
-
-    /**
-     * Щоб випадково не зберегли гостя
-     */
-    public function save()
-    {
-        throw new \Exception('Can\'t save guest account');
     }
 
     /**
@@ -103,5 +80,14 @@ class Guest extends User
     public function isGuest()
     {
         return true;
+    }
+
+
+    public function toArray()
+    {
+        $ret['roles'] = [];
+        $ret['acl'] = [];
+
+        return $this;
     }
 }
