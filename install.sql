@@ -7,8 +7,6 @@ CREATE TABLE IF NOT EXISTS `cms_languages` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- Экспортируемые данные не выделены.
-
 
 -- Дамп структуры для таблица bazalt_cms.cms_themes
 DROP TABLE IF EXISTS `cms_themes`;
@@ -72,10 +70,6 @@ CREATE TABLE IF NOT EXISTS `cms_sites` (
   CONSTRAINT `FK_cms_sites_cms_users` FOREIGN KEY (`user_id`) REFERENCES `cms_users` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- Экспортируемые данные не выделены.
-
-
--- Дамп структуры для таблица bazalt_cms.cms_sites_ref_users
 DROP TABLE IF EXISTS `cms_sites_ref_users`;
 CREATE TABLE IF NOT EXISTS `cms_sites_ref_users` (
   `site_id` int(10) unsigned NOT NULL,
