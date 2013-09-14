@@ -20,6 +20,26 @@ CREATE TABLE IF NOT EXISTS `cms_themes` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+-- Дамп структуры для таблица bazalt_cms.cms_users
+DROP TABLE IF EXISTS `cms_users`;
+CREATE TABLE IF NOT EXISTS `cms_users` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `login` varchar(60) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `firstname` varchar(255) DEFAULT NULL COMMENT 'Ім''я',
+  `secondname` varchar(255) DEFAULT NULL COMMENT 'Прізвище',
+  `patronymic` varchar(255) DEFAULT NULL COMMENT 'По-батькові',
+  `gender` enum('unknown','male','female') NOT NULL DEFAULT 'unknown' COMMENT 'Стать',
+  `birth_date` date DEFAULT NULL COMMENT 'Дата народження',
+  `email` varchar(60) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `is_active` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `last_activity` datetime DEFAULT NULL,
+  `session_id` varchar(50) DEFAULT NULL,
+  `is_god` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `login` (`login`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Дамп структуры для таблица bazalt_cms.cms_sites
 DROP TABLE IF EXISTS `cms_sites`;
@@ -69,25 +89,3 @@ CREATE TABLE IF NOT EXISTS `cms_sites_ref_users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Экспортируемые данные не выделены.
-
-
--- Дамп структуры для таблица bazalt_cms.cms_users
-DROP TABLE IF EXISTS `cms_users`;
-CREATE TABLE IF NOT EXISTS `cms_users` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `login` varchar(60) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `firstname` varchar(255) DEFAULT NULL COMMENT 'Ім''я',
-  `secondname` varchar(255) DEFAULT NULL COMMENT 'Прізвище',
-  `patronymic` varchar(255) DEFAULT NULL COMMENT 'По-батькові',
-  `gender` enum('unknown','male','female') NOT NULL DEFAULT 'unknown' COMMENT 'Стать',
-  `birth_date` date DEFAULT NULL COMMENT 'Дата народження',
-  `email` varchar(60) DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `is_active` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `last_activity` datetime DEFAULT NULL,
-  `session_id` varchar(50) DEFAULT NULL,
-  `is_god` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `login` (`login`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
