@@ -19,6 +19,7 @@
         "peej/tonic": "*",
         "filp/whoops": "*",
         "bazalt/data": "dev-master",
+        "bazalt/rest": "dev-master",
         "swiftmailer/swiftmailer": "*",
         "bazalt/session": "dev-master"
     }
