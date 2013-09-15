@@ -19,7 +19,15 @@ class SessionResource extends \Bazalt\Rest\Resource
     public function getUser()
     {
         $user = \Bazalt\Auth::getUser();
-        return new Response(Response::OK, $user->toArray());
+        $ret = $user->toArray();
+
+        if (!$user->isGuest()) {
+            $ret['acl'] = [];
+            foreach ($user->getPermissions() as $permission) {
+                $ret['acl'] []= $permission->id;
+            }
+        }
+        return new Response(Response::OK, $ret);
     }
 
     /**

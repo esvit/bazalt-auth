@@ -2,7 +2,7 @@ define('bazalt-auth/factories/baSessionResource', ['bazalt-auth/app'], function 
 
     app.factory('baSessionResource', ['$resource', '$q', 'baConfig', '$injector',
         function ($resource, $q, baConfig, $injector) {
-            var res = $resource(baConfig.apiEndpoint() + '/sessions', {}, {
+            var res = $resource(baConfig.apiEndpoint() + '/session', {}, {
                 login: { method: 'POST' },
                 logout: { method: 'DELETE' }
             });

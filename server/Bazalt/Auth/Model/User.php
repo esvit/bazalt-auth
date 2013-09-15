@@ -171,12 +171,7 @@ class User extends Base\User
         unset($ret['password']);
         unset($ret['session_id']);
         unset($ret['is_god']);
-        $ret['roles'] = [];
-//        $ret['acl'] = \Bazalt\Auth::getUserLevels($this);
-        foreach ($this->Roles as $role) {
-            $ret['roles'][] = $role->id;
-            $ret['acl']['system'] |= (int)$role->system_acl;
-        }
+
         $ret['fullname'] = $this->getName();
         $ret['is_active'] = $this->is_active == '1';
         //if ($this->is_deleted) {
@@ -254,6 +249,16 @@ class User extends Base\User
     public function getRemindKey()
     {
         return md5($this->login . $this->email . CMS_Bazalt::getSecretKey());
+    }
+
+    public function getPermissions()
+    {
+        $q = ORM::select('Bazalt\\Auth\\Model\\Permission p', 'p.*')
+                ->innerJoin('Bazalt\\Auth\\Model\\RoleRefPermission rp', ['permission_id', 'p.id'])
+                ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'rp.role_id'])
+                ->where('ru.user_id = ?', $this->id);
+
+        return $q->fetchAll();
     }
 
     /**
