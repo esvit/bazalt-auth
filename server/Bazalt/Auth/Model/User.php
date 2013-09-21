@@ -84,7 +84,8 @@ class User extends Base\User
         //if ($splitRoles) {
             $q = $this->Roles->getQuery();
             //$q->andWhere('ref.site_id = ?', CMS\Bazalt::getSiteId());
-            return $q->fetchAll();
+
+            return $q->select('ft.*')->fetchAll();
         /*} else {
             $roles = Role::getGuestRoles();
             $currentRole = CMS\User::getCurrentRole();

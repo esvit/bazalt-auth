@@ -2,21 +2,30 @@
 
 namespace tests;
 
+use Bazalt\Auth\Model\Role;
 use Bazalt\Auth\Model\User;
 
 class ResourceTest extends \tests\BaseCase
 {
     protected $model;
 
+    protected $role;
+
     protected function setUp()
     {
         $this->model = User::create();
+
+        $this->role = Role::create();
+        $this->role->title = 'Test';
     }
 
     protected function tearDown()
     {
         if ($this->model->id) {
             $this->model->delete();
+        }
+        if ($this->role->id) {
+            $this->role->delete();
         }
     }
 
@@ -51,5 +60,18 @@ class ResourceTest extends \tests\BaseCase
         $user = User::getUserByLogin('test', true);
 
         $this->assertEquals($this->model->id, $user->id);
+    }
+
+    public function testGetRoles()
+    {
+        $this->model->login = 'test';
+        $this->model->save();
+
+        $this->role->save();
+
+        $this->model->Roles->add($this->role);
+
+        $role = Role::getById($this->role->id);
+        $this->assertEquals([$role], $this->model->getRoles());
     }
 }

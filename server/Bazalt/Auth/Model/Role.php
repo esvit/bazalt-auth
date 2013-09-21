@@ -9,6 +9,7 @@ class Role extends Base\Role
     {
         $role = new Role();
         $role->system_acl = 0;
+        $role->description = '';
 
         return $role;
     }
