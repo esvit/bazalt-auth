@@ -30,7 +30,7 @@ class SessionResourceTest extends \tests\BaseCase
             'guest_id' => Session::getSessionId(),
             'is_guest' => 1
         ]);
-        $this->assertResponse('GET /auth/session', [], $response);
+        $this->assertResponse('GET /auth/session', ['contentType' => 'application/json'], $response);
     }
 
 
@@ -64,7 +64,7 @@ class SessionResourceTest extends \tests\BaseCase
 
         // get logined user
         $response = new \Bazalt\Rest\Response(200, $user->toArray());
-        $this->assertResponse('GET /auth/session', [], $response);
+        $this->assertResponse('GET /auth/session', ['contentType' => 'application/json'], $response);
 
         // logout
         $response = new \Bazalt\Rest\Response(200, true);
