@@ -23,5 +23,8 @@
         "bazalt/site": "dev-master",
         "swiftmailer/swiftmailer": "*",
         "bazalt/session": "dev-master"
+    },
+    "require-dev": {
+        "satooshi/php-coveralls": "dev-master"
     }
 }
