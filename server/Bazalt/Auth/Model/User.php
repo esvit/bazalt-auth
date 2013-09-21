@@ -78,14 +78,16 @@ class User extends Base\User
         return md5($this->id . $sid . time());
     }
 
-    public function getRoles()
+    public function getRoles($site = null)
     {
+        $site = ($site) ? $site : \Bazalt\Site::get();
+
+        $q = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
+                ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id']);
         //$splitRoles = CMS\Option::get(CMS\User::SPLIT_ROLES_OPTION, true);
         //if ($splitRoles) {
-            $q = $this->Roles->getQuery();
             //$q->andWhere('ref.site_id = ?', CMS\Bazalt::getSiteId());
 
-            return $q->select('ft.*')->fetchAll();
         /*} else {
             $roles = Role::getGuestRoles();
             $currentRole = CMS\User::getCurrentRole();
@@ -94,20 +96,23 @@ class User extends Base\User
             }
             return $roles;
         }*/
+        $q->where('(r.site_id IS NULL OR r.site_id = ?)', $site->id)
+          ->andWhere('ru.user_id = ?', $this->id)
+          ->andWhere('ru.site_id = ?', $site->id);
+
+        return $q->fetchAll();
     }
 
     /**
-     * Check if user has rights
+     * Check if user has permission
      */
-    public function hasRight($component = null, $roleValue)
+    public function hasPermission($permission, $site = null)
     {
-        if ($this->is_god || ($component != null && $this->hasRight(null, CMS\Bazalt::ACL_GODMODE))) {
+        $site = (!$site) ? \Bazalt\Site::get() : $site;
+        if ($this->is_god) {
             return true;
         }
-        if ($component != null && !($component instanceof Component)) {
-            $component = Component::getComponent(is_object($component) ? get_class($component) : $component);
-        }
-        return ($roleValue & $this->getRoleBitmask($component)) != 0;
+        return in_array($permission, $this->getPermissions($site));
     }
 
     /**
@@ -154,10 +159,7 @@ class User extends Base\User
         //if ($this->is_deleted) {
             $ret['is_deleted'] = $this->is_deleted == '1';
         //}
-        $ret['acl'] = [];
-        foreach ($this->getPermissions() as $permission) {
-            $ret['acl'] []= $permission->id;
-        }
+        $ret['permissions'] = $this->getPermissions();
         return $ret;
     }
 
@@ -239,14 +241,20 @@ class User extends Base\User
         return md5($this->login . $this->email . CMS_Bazalt::getSecretKey());
     }
 
-    public function getPermissions()
+    public function getPermissions($site = null)
     {
-        $q = ORM::select('Bazalt\\Auth\\Model\\Permission p', 'p.*')
+        $site = ($site) ? $site : \Bazalt\Site::get();
+
+        $q = ORM::select('Bazalt\\Auth\\Model\\Permission p', 'p.id')
                 ->innerJoin('Bazalt\\Auth\\Model\\RoleRefPermission rp', ['permission_id', 'p.id'])
                 ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'rp.role_id'])
                 ->where('ru.user_id = ?', $this->id);
 
-        return $q->fetchAll();
+        $ret = [];
+        foreach ($q->fetchAll() as $perm) {
+            $ret []= $perm->id;
+        }
+        return $ret;
     }
 
     /**

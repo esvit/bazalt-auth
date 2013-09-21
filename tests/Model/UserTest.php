@@ -9,14 +9,11 @@ class ResourceTest extends \tests\BaseCase
 {
     protected $model;
 
-    protected $role;
+    protected $models = [];
 
     protected function setUp()
     {
         $this->model = User::create();
-
-        $this->role = Role::create();
-        $this->role->title = 'Test';
     }
 
     protected function tearDown()
@@ -24,8 +21,8 @@ class ResourceTest extends \tests\BaseCase
         if ($this->model->id) {
             $this->model->delete();
         }
-        if ($this->role->id) {
-            $this->role->delete();
+        foreach ($this->models as $model) {
+            $model->delete();
         }
     }
 
@@ -67,11 +64,32 @@ class ResourceTest extends \tests\BaseCase
         $this->model->login = 'test';
         $this->model->save();
 
-        $this->role->save();
+        // create global role
+        $role = Role::create();
+        $role->title = 'Test';
+        $role->save();
+        $this->models []= $role;
 
-        $this->model->Roles->add($this->role);
+        // create site
+        $site = \Bazalt\Site\Model\Site::create();
+        $site->save();
+        $this->models []= $site;
 
-        $role = Role::getById($this->role->id);
+        // create local role
+        $role2 = Role::create();
+        $role2->title = 'Test2';
+        $role2->site_id = $site->id;
+        $role2->save();
+        $this->models []= $role2;
+
+        $this->model->Roles->add($role, ['site_id' => \Bazalt\Site::getId()]);
+        $this->model->Roles->add($role, ['site_id' => $site->id]);
+        $this->model->Roles->add($role2, ['site_id' => $site->id]);
+
+        $role = Role::getById($role->id);
         $this->assertEquals([$role], $this->model->getRoles());
+
+        $role2 = Role::getById($role2->id);
+        $this->assertEquals([$role, $role2], $this->model->getRoles($site));
     }
 }
