@@ -6,7 +6,7 @@ abstract class RoleRefUser extends \Bazalt\ORM\Record
 {
     const TABLE_NAME = 'cms_roles_ref_users';
 
-    const MODEL_NAME = 'Bazalt\Auth\Model\RoleRefUser';
+    const MODEL_NAME = 'Bazalt\\Auth\\Model\\RoleRefUser';
 
     public function __construct()
     {

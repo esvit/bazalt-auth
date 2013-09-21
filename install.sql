@@ -1,4 +1,3 @@
--- Дамп структуры для таблица bazalt_cms.cms_languages
 DROP TABLE IF EXISTS `cms_languages`;
 CREATE TABLE IF NOT EXISTS `cms_languages` (
   `id` varchar(2) COLLATE utf8_unicode_ci NOT NULL,
@@ -7,8 +6,6 @@ CREATE TABLE IF NOT EXISTS `cms_languages` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-
--- Дамп структуры для таблица bazalt_cms.cms_themes
 DROP TABLE IF EXISTS `cms_themes`;
 CREATE TABLE IF NOT EXISTS `cms_themes` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'default',
@@ -18,7 +15,12 @@ CREATE TABLE IF NOT EXISTS `cms_themes` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- Дамп структуры для таблица bazalt_cms.cms_users
+CREATE TABLE `cms_permissions` (
+  `id` VARCHAR(50) NOT NULL COLLATE 'utf8_unicode_ci',
+  `description` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8_unicode_ci',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE='utf8_unicode_ci';
+
 DROP TABLE IF EXISTS `cms_users`;
 CREATE TABLE IF NOT EXISTS `cms_users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -39,7 +41,6 @@ CREATE TABLE IF NOT EXISTS `cms_users` (
   UNIQUE KEY `login` (`login`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Дамп структуры для таблица bazalt_cms.cms_sites
 DROP TABLE IF EXISTS `cms_sites`;
 CREATE TABLE IF NOT EXISTS `cms_sites` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -98,6 +99,14 @@ CREATE TABLE IF NOT EXISTS `cms_roles` (
   CONSTRAINT `FK_cms_roles_cms_sites` FOREIGN KEY (`site_id`) REFERENCES `cms_sites` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Ролі користувачів';
 
+CREATE TABLE `cms_roles_permissions` (
+  `role_id` INT(10) UNSIGNED NOT NULL,
+  `permission_id` VARCHAR(50) NOT NULL COLLATE 'utf8_unicode_ci',
+  PRIMARY KEY (`role_id`, `permission_id`),
+  INDEX `FK__cms_permissions` (`permission_id`),
+  CONSTRAINT `FK__cms_permissions` FOREIGN KEY (`permission_id`) REFERENCES `cms_permissions` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE,
+  CONSTRAINT `FK__cms_users` FOREIGN KEY (`role_id`) REFERENCES `cms_roles` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE='utf8_unicode_ci';
 
 DROP TABLE IF EXISTS `cms_roles_ref_users`;
 CREATE TABLE IF NOT EXISTS `cms_roles_ref_users` (

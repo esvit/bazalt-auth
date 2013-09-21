@@ -15,9 +15,15 @@ class User extends Base\User
     
     protected $timeOffset = null;
 
+    /**
+     * Создает пустого пользователя без сохранения его в базу
+     *
+     * @return User
+     */
     public static function create()
     {
         $user = new User();
+        $user->password = '';
         $user->gender = 'unknown';
 
         return $user;
@@ -55,12 +61,13 @@ class User extends Base\User
      */
     public static function getByIdAndSession($id, $sessionId = null)
     {
-        $q = ORM::select('Bazalt\Auth\Model\User u')
-                ->where('u.id = ?', $id);
-                //->andWhere('ref.site_id = ?', CMS\Bazalt::getSiteID());
+        $q = ORM::select('Bazalt\\Auth\\Model\\User u')
+                ->innerJoin('Bazalt\\Auth\\Model\\SiteRefUser ref', ['user_id', 'u.id'])
+                ->where('u.id = ?', $id)
+                ->andWhere('ref.site_id = ?', \Bazalt\Site::getId());
 
         if ($sessionId != null) {
-            //$q->andWhere('ref.session_id = ?', $sessionId);
+            $q->andWhere('ref.session_id = ?', $sessionId);
         }
         return $q->noCache()->fetch();
     }
@@ -71,37 +78,6 @@ class User extends Base\User
         return md5($this->id . $sid . time());
     }
 
-    /**
-     * Get access bit mask for component or system
-     */
-    protected function getRoleBitmask($component = null)
-    {
-        if ($component == null) {
-            if ($this->systemAcl === null) {
-                $res = 0;
-                foreach ($this->getRoles() as $role) {
-                    $res |= $role->system_acl;
-                }
-                $this->systemAcl = $res;
-            }
-            return $this->systemAcl;
-        } else if (!isset($this->componentsAcl[$component->id])) {
-            $roles = array();
-            foreach ($this->getRoles() as $role) {
-                $roles []= $role->id;
-            }
-
-            // no roles - no rights
-            if (count($roles) == 0) {
-                return 0;
-            }
-
-            $acl = Role::getBitmask($roles, $component);
-            $this->componentsAcl[$component->id] = $acl;
-        }
-        return $this->componentsAcl[$component->id];
-    }
-    
     public function getRoles()
     {
         //$splitRoles = CMS\Option::get(CMS\User::SPLIT_ROLES_OPTION, true);
@@ -134,7 +110,7 @@ class User extends Base\User
     }
 
     /**
-     * Повертає чи встановлює налаштування користувача
+     * Возвращает или устанавливает настройки пользователя, зависит от количества параметров
      */
     public function setting($name, $value = null, $default = null)
     {
@@ -154,8 +130,8 @@ class User extends Base\User
 
     public static function getUserWithSetting($settingName, $settingValue, $active = null)
     {
-        $q = ORM::select('Bazalt\Auth\Model\User u')
-                ->innerJoin('Bazalt\Auth\Model\UserSetting ref', array('user_id', 'u.id'))
+        $q = ORM::select('Bazalt\\Auth\\Model\\User u')
+                ->innerJoin('Bazalt\\Auth\\Model\\UserSetting ref', array('user_id', 'u.id'))
                 ->where('ref.setting = ?', $settingName)
                 ->andWhere('ref.value = ?', $settingValue);
 
@@ -177,12 +153,23 @@ class User extends Base\User
         //if ($this->is_deleted) {
             $ret['is_deleted'] = $this->is_deleted == '1';
         //}
+        $ret['acl'] = [];
+        foreach ($this->getPermissions() as $permission) {
+            $ret['acl'] []= $permission->id;
+        }
         return $ret;
     }
 
+    /**
+     * Возвращает пользователя по логину, если такой есть в базе
+     *
+     * @param $login
+     * @param bool $onlyPublish
+     * @return User|null
+     */
     public static function getUserByLogin($login, $onlyPublish = false)
     {
-        $q = ORM::select('Bazalt\Auth\Model\User u')
+        $q = ORM::select('Bazalt\\Auth\\Model\\User u')
                 ->where('login = ?', $login);
 
         if ($onlyPublish) {
@@ -336,21 +323,21 @@ class User extends Base\User
         if ($time == null) {
             $time = time();
         }
-        /*$q = SiteRefUser::select()
+        $q = SiteRefUser::select()
                 ->where('user_id = ?', $this->id)
-                ->andWhere('site_id = ?', CMS\Bazalt::getSiteID());
+                ->andWhere('site_id = ?', \Bazalt\Site::getId());
 
         $activity = $q->fetch();
         if (!$activity) {
             $activity = new SiteRefUser();
-            $activity->site_id = CMS\Bazalt::getSiteID();
+            $activity->site_id = \Bazalt\Site::getId();
             $activity->user_id = $this->id;
         }
-        $activity->session_id = \Framework\System\Session\Session::getSessionId();
+        $activity->session_id = \Bazalt\Session::getSessionId();
         $activity->last_activity = date('Y-m-d H:i:s', $time);
-        $activity->save();*/
-        
-        ORM::update('Bazalt\Auth\Model\User')
+        $activity->save();
+
+        ORM::update('Bazalt\\Auth\\Model\\User')
            ->set('last_activity', date('Y-m-d H:i:s', $time))
            ->where('id = ?', $this->id)
            ->autoClearCache(false)

@@ -14,6 +14,7 @@ class SessionResource extends \Bazalt\Rest\Resource
 {
     /**
      * @method GET
+     * @accepts application/json
      * @json
      */
     public function getUser()
@@ -21,12 +22,6 @@ class SessionResource extends \Bazalt\Rest\Resource
         $user = \Bazalt\Auth::getUser();
         $ret = $user->toArray();
 
-        if (!$user->isGuest()) {
-            $ret['acl'] = [];
-            foreach ($user->getPermissions() as $permission) {
-                $ret['acl'] []= $permission->id;
-            }
-        }
         return new Response(Response::OK, $ret);
     }
 
@@ -36,13 +31,14 @@ class SessionResource extends \Bazalt\Rest\Resource
      */
     public function login()
     {
+        /** @var \Bazalt\Auth\Model\User $user */
         $user = null;
         $data = Validator::create($this->request->data);
         $data->field('password')->required();
         $data->field('email')->required()->validator('exist_user', function($value) use (&$user, $data) {
             $user = User::getUserByLoginPassword($value, $data['password'], true);
             return ($user != null);
-        }, 'User with this email does not exists');
+        }, 'User with this login/email does not exists');
 
         if (!$data->validate()) {
             return new Response(400, $data->errors());

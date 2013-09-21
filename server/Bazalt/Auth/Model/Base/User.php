@@ -26,7 +26,7 @@ abstract class User extends \Bazalt\ORM\Record
 {
     const TABLE_NAME = 'cms_users';
 
-    const MODEL_NAME = 'Bazalt\Auth\Model\User';
+    const MODEL_NAME = 'Bazalt\\Auth\\Model\\User';
 
     public function __construct()
     {

@@ -20,6 +20,7 @@
         "filp/whoops": "*",
         "bazalt/data": "dev-master",
         "bazalt/rest": "dev-master",
+        "bazalt/site": "dev-master",
         "swiftmailer/swiftmailer": "*",
         "bazalt/session": "dev-master"
     }
