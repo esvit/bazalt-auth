@@ -151,7 +151,6 @@ class User extends Base\User
     {
         $ret = $this->values;
         unset($ret['password']);
-        unset($ret['session_id']);
         unset($ret['is_god']);
 
         $ret['fullname'] = $this->getName();
@@ -263,40 +262,6 @@ class User extends Base\User
     public function removeSetting($name)
     {
         UserSetting::removeUserSetting($this, $name);
-    }
-
-    public function setPhoto($filename)
-    {
-        $this->setting('photo', $filename);
-    }
-
-    public function getPhoto($size = null)
-    {
-        $photo = $this->setting('photo');
-
-        if (!empty($photo) && $size != null) {
-            return CMS_Image::getThumb($photo, $size);
-        }
-        return $photo;
-    }
-
-    public function setAvatar($filename)
-    {
-        $this->setting('avatar', $filename);
-    }
-    
-    public function getAvatar($size = null)
-    {
-        $avatar = $this->setting('avatar');
-        if (empty($avatar)) {
-            $avatar = '/uploads/default_avatar.jpg';
-            $this->setting('avatar', $avatar);
-        }
-
-        if (!empty($avatar) && $size != null) {
-            return CMS_Image::getThumb($avatar, $size);
-        }
-        return $avatar;
     }
 
     public function getName()
