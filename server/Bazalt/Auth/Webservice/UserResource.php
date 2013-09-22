@@ -27,6 +27,32 @@ class UserResource extends \Bazalt\Rest\Resource
     }
 
     /**
+     * @method PUT
+     * @action activate
+     * @json
+     */
+    public function activateUser($id)
+    {
+        $user = User::getById($id);
+        if (!$user || $user->is_deleted) {
+            return new Response(400, ['id' => 'User not found']);
+        }
+        if (!isset($_GET['key']) || $user->getActivationKey() != trim($_GET['key'])) {
+            return new Response(Response::BADREQUEST, [
+                'key' => ['invalid' => 'Invalid activation key']
+            ]);
+        }
+        if ($user->is_active) {
+            return new Response(Response::BADREQUEST, [
+                'key' => ['user_activated' => 'User already activated']
+            ]);
+        }
+        $user->is_activate = 1;
+        $user->save();
+        return new Response(Response::OK, $user->toArray());
+    }
+
+    /**
      * @method DELETE
      * @json
      */

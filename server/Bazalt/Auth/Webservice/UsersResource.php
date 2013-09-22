@@ -54,7 +54,7 @@ class UsersResource extends \Bazalt\Rest\Resource
         }, 'User with this email already exists');
 
         $userRoles = [];
-        $data->field('roles')->validator('validRoles', function($roles) use (&$userRoles) {
+        /*$data->field('roles')->validator('validRoles', function($roles) use (&$userRoles) {
             foreach ($roles as $role) {
                 $userRoles[$role] = Role::getById($role);
                 if (!$userRoles[$role]) {
@@ -62,7 +62,7 @@ class UsersResource extends \Bazalt\Rest\Resource
                 }
             }
             return true;
-        }, 'Invalid roles');
+        }, 'Invalid roles');*/
 
         $data->field('login')->required();
         $data->field('gender')->required();
@@ -78,8 +78,6 @@ class UsersResource extends \Bazalt\Rest\Resource
         $user->patronymic = $data['patronymic'];
         $user->password = User::cryptPassword($data['password']);
         $user->gender = $data['gender'];
-        $user->is_active = $data['is_active'];
-        $user->is_deleted = $data['is_deleted'];
         $user->save();
 
         $user->Roles->clearRelations(array_keys($userRoles));
@@ -91,19 +89,18 @@ class UsersResource extends \Bazalt\Rest\Resource
         $message = \Swift_Message::newInstance()
 
             // Give the message a subject
-            ->setSubject('Your subject')
+            ->setSubject('Благодарим за регистрацию на MixFree')
 
             // Set the From address with an associative array
-            ->setFrom(array('john@doe.com' => 'John Doe'))
+            ->setFrom(array('info@mixjournal.com' => 'MixFree'))
 
             // Set the To addresses with an associative array
             ->setTo([$user->email])
 
             // Give it a body
-            ->setBody('Here is the message itself')
-
-            // And optionally an alternative body
-            ->addPart('<q>Here is the message itself</q>', 'text/html');
+            ->setBody(
+                sprintf('Ваш ключ активации: http://localhost/user/activation/%d/%s', $user->id, $user->getActivationKey())
+            );
 
         $transport = \Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, 'ssl')
             ->setUsername('no-reply@mistinfo.com')

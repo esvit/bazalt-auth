@@ -25,6 +25,7 @@ class User extends Base\User
         $user = new User();
         $user->password = '';
         $user->gender = 'unknown';
+        $user->is_deleted = 0;
 
         return $user;
     }
@@ -233,12 +234,12 @@ class User extends Base\User
 
     public function getActivationKey()
     {
-        return md5($this->login . $this->password . CMS_Bazalt::getSecretKey());
+        return md5($this->login . $this->password . $this->created_at);// . \Bazalt\Site::getSecretKey());
     }
 
     public function getRemindKey()
     {
-        return md5($this->login . $this->email . CMS_Bazalt::getSecretKey());
+        return md5($this->login . $this->email);// . CMS_Bazalt::getSecretKey());
     }
 
     public function getPermissions($site = null)

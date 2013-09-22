@@ -9,17 +9,18 @@ namespace Bazalt\Auth\Model\Base;
  * @package   DataModel
  *
  * @property-read int $id
- * @property-read varchar $login
- * @property-read varchar $password
- * @property-read varchar $firstname
- * @property-read varchar $secondname
- * @property-read varchar $patronymic
- * @property-read varchar $email
- * @property-read varchar $gender
- * @property-read varchar $birth_date
+ * @property-read string $login
+ * @property-read string $password
+ * @property-read string $firstname
+ * @property-read string $secondname
+ * @property-read string $patronymic
+ * @property-read string $email
+ * @property-read string $gender
+ * @property-read string $birth_date
  * @property-read bool $is_active
- * @property-read varchar $last_activity
- * @property-read varchar $activation_code
+ * @property-read bool $is_deleted
+ * @property-read string $last_activity
+ * @property-read string $created_at
  * @property-read bool $is_god
  */
 abstract class User extends \Bazalt\ORM\Record
@@ -45,11 +46,9 @@ abstract class User extends \Bazalt\ORM\Record
         $this->hasColumn('gender', "ENUM('unknown','male','female')|'unknown'");
         $this->hasColumn('birth_date', 'N:date');
         $this->hasColumn('is_active', 'U:tinyint(1)');
-        $this->hasColumn('is_deleted', 'U:tinyint(1)');
+        $this->hasColumn('is_deleted', 'U:tinyint(1):0');
         $this->hasColumn('last_activity', 'N:datetime');
-        $this->hasColumn('activation_code', 'varchar(50)');
         $this->hasColumn('is_god', 'U:tinyint(1)');
-        $this->hasColumn('auth_code', 'varchar(50)');
     }
 
     public function initRelations()
