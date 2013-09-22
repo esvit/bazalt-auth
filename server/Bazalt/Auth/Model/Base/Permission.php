@@ -15,7 +15,7 @@ abstract class Permission extends \Bazalt\ORM\Record
 
     protected function initFields()
     {
-        $this->hasColumn('id', 'varchar(50)');
+        $this->hasColumn('id', 'P:varchar(50)');
         $this->hasColumn('description', 'varchar(255)');
     }
 

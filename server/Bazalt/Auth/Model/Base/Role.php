@@ -26,6 +26,8 @@ abstract class Role extends \Bazalt\ORM\Record
 
     public function initRelations()
     {
-        $this->hasRelation('Users', new \Bazalt\ORM\Relation\Many2Many('Bazalt\\Auth\\Model\\User', 'user_id', 'Bazalt\\Auth\\Model\\RoleRefUser', 'role_id'));
+        $this->hasRelation('Users', new \Bazalt\ORM\Relation\Many2Many('Bazalt\\Auth\\Model\\User', 'role_id', 'Bazalt\\Auth\\Model\\RoleRefUser', 'user_id'));
+
+        $this->hasRelation('Permissions', new \Bazalt\ORM\Relation\Many2Many('Bazalt\\Auth\\Model\\Permission', 'role_id', 'Bazalt\\Auth\\Model\\RoleRefPermission', 'permission_id'));
     }
 }
