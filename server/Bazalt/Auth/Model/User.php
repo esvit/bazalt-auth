@@ -152,6 +152,7 @@ class User extends Base\User
         $ret = $this->values;
         unset($ret['password']);
         unset($ret['is_god']);
+        unset($ret['session_id']);
 
         $ret['fullname'] = $this->getName();
         $ret['is_active'] = $this->is_active == '1';

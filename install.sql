@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `cms_users` (
   `email` varchar(60) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `is_active` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `is_deleted` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `last_activity` datetime DEFAULT NULL,
   `session_id` varchar(50) DEFAULT NULL,
   `is_god` tinyint(3) unsigned NOT NULL DEFAULT '0',

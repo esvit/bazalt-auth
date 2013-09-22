@@ -82,6 +82,10 @@ class Guest extends \stdClass
         return true;
     }
 
+    public function hasPermission()
+    {
+        return false;
+    }
 
     public function toArray()
     {
