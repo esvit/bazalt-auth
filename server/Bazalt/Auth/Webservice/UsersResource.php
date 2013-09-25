@@ -37,6 +37,20 @@ class UsersResource extends \Bazalt\Rest\Resource
     }
 
     /**
+     * @method GET
+     * @action checkEmail
+     * @json
+     */
+    public function checkEmail()
+    {
+        if (!isset($_GET['email'])) {
+            return new Response(400, ['email' => 'Email can\'t be empty']);
+        }
+        $user = User::getUserByEmail($_GET['email']);
+        return new Response(Response::OK, ['valid' => $user == null]);
+    }
+
+    /**
      * @method POST
      * @json
      */

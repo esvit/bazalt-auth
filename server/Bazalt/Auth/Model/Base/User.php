@@ -17,6 +17,7 @@ namespace Bazalt\Auth\Model\Base;
  * @property-read string $email
  * @property-read string $gender
  * @property-read string $birth_date
+ * @property-read string $avatar
  * @property-read bool $is_active
  * @property-read bool $is_deleted
  * @property-read string $last_activity
@@ -42,6 +43,7 @@ abstract class User extends \Bazalt\ORM\Record
         $this->hasColumn('firstname', 'varchar(255)');
         $this->hasColumn('secondname', 'varchar(255)');
         $this->hasColumn('patronymic', 'varchar(255)');
+        $this->hasColumn('avatar', 'varchar(255)');
         $this->hasColumn('email', 'N:varchar(60)');
         $this->hasColumn('gender', "ENUM('unknown','male','female')|'unknown'");
         $this->hasColumn('birth_date', 'N:date');

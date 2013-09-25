@@ -28,6 +28,37 @@ class UserResource extends \Bazalt\Rest\Resource
 
     /**
      * @method PUT
+     * @action changePassword
+     * @json
+     */
+    public function changePassword($id)
+    {
+        $user = User::getById($id);
+        if (!$user || $user->is_deleted || !$user->is_active) {
+            return new Response(400, ['id' => 'User not found']);
+        }
+        $current = \Bazalt\Auth::getUser();
+        if ($user->id != $current->id) {
+            return new Response(403, 'Permission denied');
+        }
+        $data = (array)$this->request->data;
+        if (!isset($data['old_password']) || User::cryptPassword($data['old_password']) != $user->password) {
+            return new Response(Response::BADREQUEST, [
+                'old_password' => ['invalid' => 'Invalid old password']
+            ]);
+        }
+        if (!isset($data['new_password'])) {
+            return new Response(Response::BADREQUEST, [
+                'new_password' => ['invalid' => 'Invalid new password']
+            ]);
+        }
+        $user->password = User::cryptPassword($data['new_password']);
+        $user->save();
+        return new Response(Response::OK, $user->toArray());
+    }
+
+    /**
+     * @method PUT
      * @action activate
      * @json
      */
@@ -47,7 +78,7 @@ class UserResource extends \Bazalt\Rest\Resource
                 'key' => ['user_activated' => 'User already activated']
             ]);
         }
-        $user->is_activate = 1;
+        $user->is_active = 1;
         $user->save();
         return new Response(Response::OK, $user->toArray());
     }
@@ -76,6 +107,7 @@ class UserResource extends \Bazalt\Rest\Resource
 
     /**
      * @method PUT
+     * @method POST
      * @json
      */
     public function saveUser()
@@ -91,10 +123,12 @@ class UserResource extends \Bazalt\Rest\Resource
 
         $userRoles = [];
         $data->field('roles')->validator('validRoles', function($roles) use (&$userRoles) {
-            foreach ($roles as $role) {
-                $userRoles[$role] = Role::getById($role);
-                if (!$userRoles[$role]) {
-                    return false;
+            if ($roles) {
+                foreach ($roles as $role) {
+                    $userRoles[$role] = Role::getById($role);
+                    if (!$userRoles[$role]) {
+                        return false;
+                    }
                 }
             }
             return true;
@@ -112,6 +146,7 @@ class UserResource extends \Bazalt\Rest\Resource
         $user->firstname = $data['firstname'];
         $user->secondname = $data['secondname'];
         $user->patronymic = $data['patronymic'];
+        $user->birth_date = date('Y-m-d', strToTime($data['birth_date']));
         $user->password = User::cryptPassword($data['password']);
         $user->gender = $data['gender'];
         $user->is_active = $data['is_active'];

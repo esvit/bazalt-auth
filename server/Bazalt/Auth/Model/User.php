@@ -156,6 +156,7 @@ class User extends Base\User
         unset($ret['session_id']);
 
         $ret['fullname'] = $this->getName();
+        $ret['birth_date'] = date('d.m.Y', strToTime($this->birth_date));
         $ret['is_active'] = $this->is_active == '1';
         //if ($this->is_deleted) {
             $ret['is_deleted'] = $this->is_deleted == '1';
