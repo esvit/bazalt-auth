@@ -147,7 +147,7 @@ class UserResource extends \Bazalt\Rest\Resource
         $user->secondname = $data['secondname'];
         $user->patronymic = $data['patronymic'];
         $user->birth_date = date('Y-m-d', strToTime($data['birth_date']));
-        $user->password = User::cryptPassword($data['password']);
+        //$user->password = User::cryptPassword($data['password']);
         $user->gender = $data['gender'];
         $user->is_active = $data['is_active'];
         $user->is_deleted = $data['is_deleted'];
