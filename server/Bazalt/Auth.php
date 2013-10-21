@@ -21,7 +21,7 @@ class Auth
         if (!self::$currentUser && $session->user_id) {
             $user = Auth\Model\User::getByIdAndSession((int)$session->user_id, Session::getSessionId());
 
-            if ($user && ($_COOKIE['authorization_token'] == $session->authorization_token)) {
+            if ($user && isset($_COOKIE['authorization_token']) && ($_COOKIE['authorization_token'] == $session->authorization_token)) {
                 self::$currentUser = $user;
             } else {
                 self::logout();
