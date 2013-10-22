@@ -5,7 +5,7 @@ namespace tests;
 use Bazalt\Auth\Model\Role;
 use Bazalt\Auth\Model\User;
 
-class ResourceTest extends \tests\BaseCase
+class ResourceTest extends \Bazalt\Auth\Test\BaseCase
 {
     protected $model;
 
@@ -13,11 +13,15 @@ class ResourceTest extends \tests\BaseCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $this->model = User::create();
     }
 
     protected function tearDown()
     {
+        parent::tearDown();
+
         if ($this->model->id) {
             $this->model->delete();
         }

@@ -6,12 +6,14 @@ use Bazalt\Rest;
 use Bazalt\Session;
 use Tonic;
 
-class SessionResourceTest extends \tests\BaseCase
+class SessionResourceTest extends \Bazalt\Auth\Test\BaseCase
 {
     protected $app;
 
     protected function setUp()
     {
+        parent::setUp();
+
         $config = array(
             'load' => array(
                 __DIR__ .'/../../server/Bazalt/Auth/Webservice/*.php'
@@ -20,12 +22,9 @@ class SessionResourceTest extends \tests\BaseCase
         $this->app = new Tonic\Application($config);
     }
 
-    protected function tearDown()
-    {
-    }
-
     public function testGet()
     {
+        \Bazalt\Auth::logout();
         $response = new \Bazalt\Rest\Response(200,[
             'guest_id' => Session::getSessionId(),
             'is_guest' => 1
@@ -67,11 +66,11 @@ class SessionResourceTest extends \tests\BaseCase
         $this->assertResponse('GET /auth/session', ['contentType' => 'application/json'], $response);
 
         // logout
-        $response = new \Bazalt\Rest\Response(200, true);
-        $this->assertResponse('DELETE /auth/session', [], $response);
+        $response = new \Bazalt\Rest\Response(200, '/is_guest/');
+        $this->assertRegExpResponse('DELETE /auth/session', [], $response);
 
         // guest logout
-        $response = new \Bazalt\Rest\Response(200, false);
-        $this->assertResponse('DELETE /auth/session', [], $response);
+        $response = new \Bazalt\Rest\Response(200, '/is_guest/');
+        $this->assertRegExpResponse('DELETE /auth/session', [], $response);
     }
 }

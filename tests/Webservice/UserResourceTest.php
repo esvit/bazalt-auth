@@ -9,7 +9,7 @@ use Bazalt\Rest;
 use Bazalt\Session;
 use Tonic;
 
-class UserResourceTest extends \tests\BaseCase
+class UserResourceTest extends \Bazalt\Auth\Test\BaseCase
 {
     protected $app;
 
@@ -17,6 +17,8 @@ class UserResourceTest extends \tests\BaseCase
 
     protected function setUp()
     {
+        parent::setUp();
+
         $config = array(
             'load' => array(
                 __DIR__ .'/../../server/Bazalt/Auth/Webservice/*.php'
@@ -27,6 +29,8 @@ class UserResourceTest extends \tests\BaseCase
 
     protected function tearDown()
     {
+        parent::tearDown();
+
         foreach ($this->models as $model) {
             $model->delete();
         }

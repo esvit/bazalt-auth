@@ -41,9 +41,9 @@ class Auth
         return self::$currentUser;
     }
 
-    public static function setUser(Auth\Model\User $user, $remember = false)
+    public static function setUser($user, $remember = false)
     {
-        if (!$user->is_active) {
+        if (!$user || !$user->is_active) {
             return Auth\Model\Guest::create(Session::getSessionId());
         }
         $session = new Session('auth');
