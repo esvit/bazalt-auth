@@ -15,7 +15,6 @@
     "require": {
         "analog/analog": "dev-master",
         "bazalt/orm": "dev-master",
-        "bazalt/view": "dev-master",
         "peej/tonic": "*",
         "filp/whoops": "*",
         "bazalt/data": "dev-master",
