@@ -96,4 +96,60 @@ class ResourceTest extends \Bazalt\Auth\Test\BaseCase
         $role2 = Role::getById($role2->id);
         $this->assertEquals([$role, $role2], $this->model->getRoles($site));
     }
+
+    public function testHasRole()
+    {
+        // create local role
+        $role2 = Role::create();
+        $role2->title = 'TestHas';
+        $role2->site_id = $this->site->id;
+        $role2->save();
+        $this->models []= $role2;
+
+        $this->assertFalse($this->user->hasRole($role2->id, $this->site));
+
+        $this->user->Roles->add($role2, ['site_id' => $this->site->id]);
+
+        $this->assertTrue($this->user->hasRole($role2->id, $this->site));
+    }
+
+    public function testSwitchRole()
+    {
+        \Bazalt\Site\Option::set(\Bazalt\Auth::SPLIT_ROLES_OPTION, false);
+
+        // create role
+        $role = Role::create();
+        $role->title = 'Test1';
+
+        $role->save();
+        $this->models []= $role;
+
+        // create role
+        $role2 = Role::create();
+        $role2->title = 'Test2';
+        $role2->save();
+        $this->models []= $role2;
+
+        $this->user->Roles->add($role, ['site_id' => $this->site->id]);
+        $this->user->Roles->add($role2, ['site_id' => $this->site->id]);
+
+//        print_r($this->user->getRoles());
+        $curRole = current($this->user->getRoles());
+        $this->assertEquals($role->id, $curRole->id);
+
+        $this->assertTrue(\Bazalt\Auth::setCurrentRole($role->id));
+        $curRole = current($this->user->getRoles());
+        $this->assertEquals($role->id, $curRole->id);
+
+        $this->assertTrue(\Bazalt\Auth::setCurrentRole($role2->id));
+        $curRole = current($this->user->getRoles());
+        $this->assertEquals($role2->id, $curRole->id);
+
+        $this->assertFalse(\Bazalt\Auth::setCurrentRole(9999));//try to set non exists role
+
+        $curRole = current($this->user->getRoles());
+        $this->assertEquals($role2->id, $curRole->id);
+
+        \Bazalt\Site\Option::set(\Bazalt\Auth::SPLIT_ROLES_OPTION, true);
+    }
 }

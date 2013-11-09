@@ -4,6 +4,8 @@ namespace Bazalt;
 
 class Auth
 {
+    const SPLIT_ROLES_OPTION = 'Auth.SplitRoles';
+
     /**
      * @var \Bazalt\Auth\Model\User
      */
@@ -92,5 +94,46 @@ class Auth
     {
         // 30 days
         return 30 * 24 * 60 * 60;
+    }
+
+
+    /**
+     * Only for separated roles mode
+     *
+     * @return \Bazalt\Auth\Model\Role|null
+     */
+    public static function getCurrentRole()
+    {
+        $session = new Session('auth');
+        $user = self::getUser();
+        if (isset($session->currentRoleId)) {
+            $curRole = \Bazalt\Auth\Model\Role::getById((int)$session->currentRoleId);
+            if(!$curRole) {
+                return null;
+            }
+            return self::getUser()->hasRole($curRole->id) ? $curRole : null;
+        }
+        $q = $user->Roles->getQuery();
+        $q->andWhere('ref.site_id = ?', \Bazalt\Site::getId());
+        $q->limit(1);
+        return $q->fetch();
+    }
+
+    /**
+     * Only for separated roles mode
+     *
+     * @return bool true if set role - success
+     */
+    public static function setCurrentRole($roleId)
+    {
+        $session = new Session('auth');
+        $curRole = \Bazalt\Auth\Model\Role::getById((int)$roleId);
+        if($curRole) {
+            if(self::getUser()->hasRole($curRole->id)) {
+                $session->currentRoleId = $curRole->id;
+                return true;
+            }
+        }
+        return false;
     }
 }

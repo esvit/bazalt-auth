@@ -79,29 +79,38 @@ class User extends Base\User
         return md5($this->id . $sid . time());
     }
 
-    public function getRoles($site = null)
+    public function hasRole($roleId, $site = null)
     {
         $site = ($site) ? $site : \Bazalt\Site::get();
 
-        $q = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
-                ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id']);
-        //$splitRoles = CMS\Option::get(CMS\User::SPLIT_ROLES_OPTION, true);
-        //if ($splitRoles) {
-            //$q->andWhere('ref.site_id = ?', CMS\Bazalt::getSiteId());
+        $q = ORM::select('Bazalt\\Auth\\Model\\RoleRefUser ru', 'COUNT(*) as cnt')
+          ->andWhere('ru.user_id = ?', $this->id)
+          ->andWhere('ru.site_id = ?', $site->id)
+          ->andWhere('ru.role_id = ?', $roleId);
 
-        /*} else {
+        return (int)$q->fetch('stdClass')->cnt > 0;
+    }
+
+    public function getRoles($site = null)
+    {
+        $site = ($site) ? $site : \Bazalt\Site::get();
+        $splitRoles = \Bazalt\Site\Option::get(\Bazalt\Auth::SPLIT_ROLES_OPTION, true);
+
+        if($splitRoles) {
+            $q = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
+                ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id'])
+                ->where('(r.site_id IS NULL OR r.site_id = ?)', $site->id)
+                ->andWhere('ru.user_id = ?', $this->id)
+                ->andWhere('ru.site_id = ?', $site->id);
+            return $q->fetchAll();
+        } else {
             $roles = Role::getGuestRoles();
-            $currentRole = CMS\User::getCurrentRole();
+            $currentRole = \Bazalt\Auth::getCurrentRole();
             if($currentRole) {
                 $roles []= $currentRole;
             }
             return $roles;
-        }*/
-        $q->where('(r.site_id IS NULL OR r.site_id = ?)', $site->id)
-          ->andWhere('ru.user_id = ?', $this->id)
-          ->andWhere('ru.site_id = ?', $site->id);
-
-        return $q->fetchAll();
+        }
     }
 
     /**
@@ -345,17 +354,6 @@ class User extends Base\User
                 ->orderBy('is_active ASC');
 
         return new \Bazalt\ORM\Collection($q);
-    }
-
-    public function addAfterLoginRole()
-    {
-        $role = CMS_Option::get(CMS\User::LOGIN_USER_ROLE_OPTION, false);
-        if (is_numeric($role)) {
-            $role = Role::getById($role);
-            if ($role) {
-                $this->Roles->add($role, array('site_id' => CMS_Bazalt::getSiteId()));
-            }
-        }
     }
     
     public static function cryptPassword($password)
