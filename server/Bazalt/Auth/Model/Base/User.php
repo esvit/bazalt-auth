@@ -23,6 +23,7 @@ namespace Bazalt\Auth\Model\Base;
  * @property-read string $last_activity
  * @property-read string $created_at
  * @property-read bool $is_god
+ * @property-read bool $need_edit
  */
 abstract class User extends \Bazalt\ORM\Record
 {
@@ -48,9 +49,10 @@ abstract class User extends \Bazalt\ORM\Record
         $this->hasColumn('gender', "ENUM('unknown','male','female')|'unknown'");
         $this->hasColumn('birth_date', 'N:date');
         $this->hasColumn('is_active', 'U:tinyint(1)');
-        $this->hasColumn('is_deleted', 'U:tinyint(1):0');
+        $this->hasColumn('is_deleted', 'U:tinyint(1)|0');
         $this->hasColumn('last_activity', 'N:datetime');
         $this->hasColumn('is_god', 'U:tinyint(1)');
+        $this->hasColumn('need_edit', 'U:tinyint(1)|0');
     }
 
     public function initRelations()
