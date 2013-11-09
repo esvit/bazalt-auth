@@ -258,6 +258,15 @@ class User extends Base\User
         $splitRoles = \Bazalt\Site\Option::get(\Bazalt\Auth::SPLIT_ROLES_OPTION, true);
 
         $ret = [];
+        if($this->is_god) {
+            $q = ORM::select('Bazalt\\Auth\\Model\\Permission p', 'p.id');
+            $res = $q->fetchAll();
+            foreach ($res as $perm) {
+                $ret []= $perm->id;
+            }
+            return $ret;
+        }
+
         if($splitRoles) {
             $q = ORM::select('Bazalt\\Auth\\Model\\Permission p', 'p.id')
                 ->innerJoin('Bazalt\\Auth\\Model\\RoleRefPermission rp', ['permission_id', 'p.id'])
