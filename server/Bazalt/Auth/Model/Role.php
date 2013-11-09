@@ -39,6 +39,14 @@ class Role extends Base\Role
         return $q->fetch();
     }
 
+    public function getPermissions()
+    {
+        $q = ORM::select('Bazalt\\Auth\\Model\\Permission p', 'p.id')
+            ->innerJoin('Bazalt\\Auth\\Model\\RoleRefPermission rp', ['permission_id', 'p.id'])
+            ->where('rp.role_id = ?', $this->id);
+        return $q->fetchAll();
+    }
+
     public static function getBitmask($roles, $component)
     {
         $acls = array();

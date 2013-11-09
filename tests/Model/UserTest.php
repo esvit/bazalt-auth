@@ -9,8 +9,6 @@ class ResourceTest extends \Bazalt\Auth\Test\BaseCase
 {
     protected $model;
 
-    protected $models = [];
-
     protected function setUp()
     {
         parent::setUp();
@@ -24,9 +22,6 @@ class ResourceTest extends \Bazalt\Auth\Test\BaseCase
 
         if ($this->model->id) {
             $this->model->delete();
-        }
-        foreach ($this->models as $model) {
-            $model->delete();
         }
     }
 
@@ -120,7 +115,6 @@ class ResourceTest extends \Bazalt\Auth\Test\BaseCase
         // create role
         $role = Role::create();
         $role->title = 'Test1';
-
         $role->save();
         $this->models []= $role;
 

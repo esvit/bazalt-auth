@@ -8,6 +8,8 @@ abstract class BaseCase extends \Bazalt\Site\Test\BaseCase
 {
     protected $user = null;
 
+    protected $models = [];
+
     protected function setUp()
     {
         parent::setUp();
@@ -34,5 +36,9 @@ abstract class BaseCase extends \Bazalt\Site\Test\BaseCase
         }
         $this->user = null;
         \Bazalt\Auth::setUser(null);
+
+        foreach ($this->models as $model) {
+            $model->delete();
+        }
     }
 }

@@ -255,17 +255,29 @@ class User extends Base\User
     public function getPermissions($site = null)
     {
         $site = ($site) ? $site : \Bazalt\Site::get();
+        $splitRoles = \Bazalt\Site\Option::get(\Bazalt\Auth::SPLIT_ROLES_OPTION, true);
 
-        $q = ORM::select('Bazalt\\Auth\\Model\\Permission p', 'p.id')
+        $ret = [];
+        if($splitRoles) {
+            $q = ORM::select('Bazalt\\Auth\\Model\\Permission p', 'p.id')
                 ->innerJoin('Bazalt\\Auth\\Model\\RoleRefPermission rp', ['permission_id', 'p.id'])
                 ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'rp.role_id'])
                 ->where('ru.user_id = ?', $this->id);
-
-        $ret = [];
-        foreach ($q->fetchAll() as $perm) {
-            $ret []= $perm->id;
+            $res = $q->fetchAll();
+            foreach ($res as $perm) {
+                $ret []= $perm->id;
+            }
+        } else {
+            $roles = $this->getRoles($site);
+            foreach($roles as $role) {
+                $res = $role->getPermissions();
+                foreach ($res as $perm) {
+                    $ret[$perm->id] = $perm->id;
+                }
+            }
         }
-        return $ret;
+
+        return array_values($ret);
     }
 
     /**
