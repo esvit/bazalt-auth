@@ -163,6 +163,7 @@ class User extends Base\User
         unset($ret['password']);
         unset($ret['is_god']);
         unset($ret['session_id']);
+        unset($ret['last_activity']);
 
         $ret['fullname'] = $this->getName();
         $ret['birth_date'] = date('d.m.Y', strToTime($this->birth_date));
