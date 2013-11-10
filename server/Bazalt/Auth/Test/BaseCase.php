@@ -21,6 +21,7 @@ abstract class BaseCase extends \Bazalt\Site\Test\BaseCase
 
         $this->user = \Bazalt\Auth\Model\User::create();
         $this->user->login = '__Test__';
+        $this->user->email = 'test@equalteam.net';
         $this->user->is_active = 1;
         $this->user->save();
 
