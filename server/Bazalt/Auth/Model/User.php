@@ -26,6 +26,7 @@ class User extends Base\User
         $user->password = '';
         $user->gender = 'unknown';
         $user->is_deleted = 0;
+        $user->need_edit = 1;
 
         return $user;
     }
