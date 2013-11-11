@@ -1,3 +1,4 @@
+drop TABLE IF EXISTS  `cms_permissions`;
 CREATE TABLE `cms_permissions` (
   `id` VARCHAR(50) NOT NULL COLLATE 'utf8_unicode_ci',
   `description` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8_unicode_ci',
@@ -21,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `cms_users` (
   `last_activity` datetime DEFAULT NULL,
   `session_id` varchar(50) DEFAULT NULL,
   `is_god` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `need_edit` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `login` (`login`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -53,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `cms_roles` (
   CONSTRAINT `FK_cms_roles_cms_sites` FOREIGN KEY (`site_id`) REFERENCES `cms_sites` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Ролі користувачів';
 
+drop TABLE `cms_roles_permissions`;
 CREATE TABLE `cms_roles_permissions` (
   `role_id` INT(10) UNSIGNED NOT NULL,
   `permission_id` VARCHAR(50) NOT NULL COLLATE 'utf8_unicode_ci',
