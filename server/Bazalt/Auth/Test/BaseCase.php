@@ -8,7 +8,17 @@ abstract class BaseCase extends \Bazalt\Site\Test\BaseCase
 {
     protected $user = null;
 
+    protected $app;
+
     protected $models = [];
+
+    protected function initApp($files)
+    {
+        $config = array(
+            'load' => $files
+        );
+        $this->app = new \Tonic\Application($config);
+    }
 
     protected function setUp()
     {
