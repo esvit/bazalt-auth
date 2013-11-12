@@ -23,9 +23,36 @@ abstract class BaseCase extends \Bazalt\Site\Test\BaseCase
         $this->user->login = '__Test__';
         $this->user->email = 'test@equalteam.net';
         $this->user->is_active = 1;
+        $this->user->password = \Bazalt\Auth\Model\User::cryptPassword(1);
         $this->user->save();
 
         \Bazalt\Auth::setUser($this->user);
+    }
+
+    protected function addPermission($permName, $user = null, $site = null)
+    {
+        if($user == null) {
+            $user = $this->user;
+        }
+        if($site == null) {
+            $site = $this->site;
+        }
+
+        $role =  \Bazalt\Auth\Model\Role::create();
+        $role->title = $permName.' test role';
+        $role->save();
+        $this->models []= $role;
+
+        $perm = \Bazalt\Auth\Model\Permission::getById($permName);
+        if(!$perm) {
+            $perm = new \Bazalt\Auth\Model\Permission();
+            $perm->id = $permName;
+            $perm->save();
+            $this->models []= $perm;
+        }
+        $role->Permissions->add($perm);
+
+        $user->Roles->add($role, ['site_id' => $site->id]);
     }
 
     protected function tearDown()
