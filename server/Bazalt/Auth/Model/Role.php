@@ -1,6 +1,7 @@
 <?php
 
 namespace Bazalt\Auth\Model;
+
 use Bazalt\ORM;
 
 class Role extends Base\Role
@@ -47,21 +48,9 @@ class Role extends Base\Role
         return $q->fetchAll();
     }
 
-    public static function getBitmask($roles, $component)
+    public function addPermission($id)
     {
-        $acls = array();
-
-        $q = ORM::select('Bazalt\Auth\Model\RoleRefComponent a', 'a.value')
-                ->andWhereIn('a.role_id', $roles)
-                ->andWhere('a.component_id = ?', $component->id);
-
-        $acls = $q->fetchAll();
-
-        // merge roles
-        $res = 0;
-        foreach ($acls as $acl) {
-            $res |= $acl->value;
-        }
-        return $res;
+        $perm = Permission::getById($id);
+        $this->Permissions->add($perm);
     }
 }
