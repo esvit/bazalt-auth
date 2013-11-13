@@ -29,6 +29,19 @@ abstract class BaseCase extends \Bazalt\Site\Test\BaseCase
         \Bazalt\Auth::setUser($this->user);
     }
 
+    protected function createAdminUser()
+    {
+        $user = \Bazalt\Auth\Model\User::create();
+        $user->login = rand();
+        $user->is_active = 1;
+        $user->is_god = 1;
+        $user->save();
+
+        $this->models []= $user;
+
+        return $user;
+    }
+
     protected function addPermission($permName, $user = null, $site = null)
     {
         if($user == null) {
