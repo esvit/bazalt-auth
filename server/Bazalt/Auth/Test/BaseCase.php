@@ -62,7 +62,7 @@ abstract class BaseCase extends \Bazalt\Site\Test\BaseCase
         }
 
         $role =  \Bazalt\Auth\Model\Role::create();
-        $role->title = $permName.' test role';
+        $role->title = $permName.' test role'.$user->id;
         $role->save();
         $this->models []= $role;
 
