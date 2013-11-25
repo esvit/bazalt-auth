@@ -27,7 +27,9 @@ class SessionResourceTest extends \Bazalt\Auth\Test\BaseCase
         \Bazalt\Auth::logout();
         $response = new \Bazalt\Rest\Response(200,[
             'guest_id' => Session::getSessionId(),
-            'is_guest' => 1
+            'is_guest' => 1,
+            'roles' => [],
+            'acl' => []
         ]);
         $this->assertResponse('GET /auth/session', ['contentType' => 'application/json'], $response);
     }
