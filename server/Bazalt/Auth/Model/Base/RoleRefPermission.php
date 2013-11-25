@@ -16,7 +16,7 @@ abstract class RoleRefPermission extends \Bazalt\ORM\Record
     protected function initFields()
     {
         $this->hasColumn('role_id', 'PU:int(10)');
-        $this->hasColumn('permission_id', 'varchar(50)');
+        $this->hasColumn('permission_id', 'P:varchar(50)');
     }
 
     public function initRelations()
