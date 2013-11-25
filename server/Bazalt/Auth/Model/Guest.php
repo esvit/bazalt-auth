@@ -89,9 +89,10 @@ class Guest extends \stdClass
 
     public function toArray()
     {
-        $ret['roles'] = [];
-        $ret['acl'] = [];
+        $arr = (array)$this;
+        $arr['roles'] = [];
+        $arr['acl'] = [];
 
-        return $this;
+        return $arr;
     }
 }

@@ -95,23 +95,12 @@ class User extends Base\User
     public function getRoles($site = null)
     {
         $site = ($site) ? $site : \Bazalt\Site::get();
-        $splitRoles = \Bazalt\Site\Option::get(\Bazalt\Auth::SPLIT_ROLES_OPTION, true);
-
-        if($splitRoles) {
-            $q = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
-                ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id'])
-                ->where('(r.site_id IS NULL OR r.site_id = ?)', $site->id)
-                ->andWhere('ru.user_id = ?', $this->id)
-                ->andWhere('ru.site_id = ?', $site->id);
-            return $q->fetchAll();
-        } else {
-            $roles = Role::getGuestRoles();
-            $currentRole = \Bazalt\Auth::getCurrentRole();
-            if($currentRole) {
-                $roles []= $currentRole;
-            }
-            return $roles;
-        }
+        $q = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
+            ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id'])
+            ->where('(r.site_id IS NULL OR r.site_id = ?)', $site->id)
+            ->andWhere('ru.user_id = ?', $this->id)
+            ->andWhere('ru.site_id = ?', $site->id);
+        return $q->fetchAll();
     }
 
     /**
@@ -278,7 +267,13 @@ class User extends Base\User
                 $ret []= $perm->id;
             }
         } else {
-            $roles = $this->getRoles($site);
+            $roles = Role::getGuestRoles();
+            $currentRole = \Bazalt\Auth::getCurrentRole();
+            if($currentRole) {
+                $roles = [
+                    $currentRole
+                ];
+            }
             foreach($roles as $role) {
                 $res = $role->getPermissions();
                 foreach ($res as $perm) {
