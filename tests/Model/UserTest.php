@@ -128,20 +128,21 @@ class ResourceTest extends \Bazalt\Auth\Test\BaseCase
         $this->user->Roles->add($role2, ['site_id' => $this->site->id]);
 
 //        print_r($this->user->getRoles());
-        $curRole = current($this->user->getRoles());
+        $curRole = \Bazalt\Auth::getCurrentRole();
+//        print_r($curRole);
         $this->assertEquals($role->id, $curRole->id);
 
         $this->assertTrue(\Bazalt\Auth::setCurrentRole($role->id));
-        $curRole = current($this->user->getRoles());
+        $curRole = \Bazalt\Auth::getCurrentRole();
         $this->assertEquals($role->id, $curRole->id);
 
         $this->assertTrue(\Bazalt\Auth::setCurrentRole($role2->id));
-        $curRole = current($this->user->getRoles());
+        $curRole = \Bazalt\Auth::getCurrentRole();
         $this->assertEquals($role2->id, $curRole->id);
 
         $this->assertFalse(\Bazalt\Auth::setCurrentRole(9999));//try to set non exists role
 
-        $curRole = current($this->user->getRoles());
+        $curRole = \Bazalt\Auth::getCurrentRole();
         $this->assertEquals($role2->id, $curRole->id);
 
         \Bazalt\Site\Option::set(\Bazalt\Auth::SPLIT_ROLES_OPTION, true);
