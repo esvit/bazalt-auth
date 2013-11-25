@@ -32,10 +32,10 @@ class Role extends Base\Role
         return $q->fetchAll();
     }
 
-    public function getByName($name)
+    public static function getByName($name)
     {
-        $q = ORM::select('Role r')
-                ->where('name = ?', $name);
+        $q = ORM::select('Bazalt\\Auth\\Model\\Role r')
+                ->where('title = ?', $name);
 
         return $q->fetch();
     }
