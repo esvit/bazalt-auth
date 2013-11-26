@@ -104,8 +104,11 @@ class Auth
      */
     public static function getCurrentRole()
     {
-        $session = new Session('auth');
         $user = self::getUser();
+        if($user->isGuest()) {
+            return null;
+        }
+        $session = new Session('auth');
         if (isset($session->currentRoleId)) {
             $curRole = \Bazalt\Auth\Model\Role::getById((int)$session->currentRoleId);
             if(!$curRole) {
