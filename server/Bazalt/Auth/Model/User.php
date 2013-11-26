@@ -94,6 +94,11 @@ class User extends Base\User
 
     public function getRoles($site = null)
     {
+        if($this->is_god) {
+            $q = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
+                    ->groupBy('r.id');
+            return $q->fetchAll();
+        }
         $site = ($site) ? $site : \Bazalt\Site::get();
         $q = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
             ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id'])
