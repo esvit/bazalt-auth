@@ -53,12 +53,12 @@ class SessionResourceTest extends \Bazalt\Auth\Test\BaseCase
             ))
         ], $response);
 
-        $user = \Bazalt\Auth\Model\User::getById(1);
+        $user = \Bazalt\Auth\Model\User::getById($this->user->id);
         $response = new \Bazalt\Rest\Response(200, $user->toArray());
 
         $this->assertResponse('POST /auth/session', [
             'data' => json_encode(array(
-                'email' => 'admin',
+                'email' => $this->user->login,
                 'password' => '1'
             ))
         ], $response);
