@@ -277,7 +277,7 @@ class User extends Base\User
         } else {
             $roles = Role::getGuestRoles();
             $currentRole = \Bazalt\Auth::getCurrentRole();
-            if($currentRole) {
+            if(!$this->isGuest() && $currentRole) {
                 $roles = [
                     $currentRole
                 ];
