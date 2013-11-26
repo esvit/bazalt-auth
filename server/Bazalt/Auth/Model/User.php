@@ -276,11 +276,13 @@ class User extends Base\User
             }
         } else {
             $roles = Role::getGuestRoles();
-            $currentRole = \Bazalt\Auth::getCurrentRole();
-            if(!$this->isGuest() && $currentRole) {
-                $roles = [
-                    $currentRole
-                ];
+            if(!$this->isGuest()) {
+                $currentRole = \Bazalt\Auth::getCurrentRole();
+                if($currentRole) {
+                    $roles = [
+                        $currentRole
+                    ];
+                }
             }
             foreach($roles as $role) {
                 $res = $role->getPermissions();
