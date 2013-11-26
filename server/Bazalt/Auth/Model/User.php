@@ -208,7 +208,8 @@ class User extends Base\User
     public static function getUserByEmail($email, $onlyPublish = false)
     {
         $q = User::select()
-                 ->where('email = ?', $email);
+                ->where('is_deleted = 0')
+                ->andWhere('email = ?', $email);
 
         if ($onlyPublish) {
             $q->andWhere('is_active = ?', 1);
