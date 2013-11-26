@@ -179,7 +179,8 @@ class User extends Base\User
     public static function getUserByLogin($login, $onlyPublish = false)
     {
         $q = ORM::select('Bazalt\\Auth\\Model\\User u')
-                ->where('login = ?', $login);
+            ->where('is_deleted = 0')
+            ->andWhere('login = ?', $login);
 
         if ($onlyPublish) {
             $q->andWhere('is_active = ?', 1);
@@ -220,6 +221,7 @@ class User extends Base\User
     public static function getByLoginAndEmail($login, $email, $onlyPublish = false)
     {
         $q = User::select()
+                 ->andWhere('is_deleted = 0')
                  ->where('login = ?', $login)
                  ->andWhere('email = ?', $email);
 
