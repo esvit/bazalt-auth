@@ -129,7 +129,8 @@ class Auth
         $session = new Session('auth');
         $curRole = \Bazalt\Auth\Model\Role::getById((int)$roleId);
         if($curRole) {
-            if(self::getUser()->hasRole($curRole->id)) {
+            $user = self::getUser();
+            if($user->is_god || $user->hasRole($curRole->id)) {
                 $session->currentRoleId = $curRole->id;
                 return true;
             }
