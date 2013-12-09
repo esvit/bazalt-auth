@@ -9,7 +9,7 @@
     ],
     "autoload": {
         "psr-0": {
-            "Bazalt\\Auth": "server"
+            "Bazalt\\Auth": "src"
         }
     },
     "require": {
