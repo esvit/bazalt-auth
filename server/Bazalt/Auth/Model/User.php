@@ -262,37 +262,40 @@ class User extends Base\User
             foreach ($res as $perm) {
                 $ret []= $perm->id;
             }
-            return $ret;
-        }
-
-        if($splitRoles) {
-            $q = ORM::select('Bazalt\\Auth\\Model\\Permission p', 'p.id')
-                ->innerJoin('Bazalt\\Auth\\Model\\RoleRefPermission rp', ['permission_id', 'p.id'])
-                ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'rp.role_id'])
-                ->where('ru.user_id = ?', $this->id);
-            $res = $q->fetchAll();
-            foreach ($res as $perm) {
-                $ret []= $perm->id;
-            }
         } else {
-            $roles = Role::getGuestRoles();
-            if(!$this->isGuest()) {
-                $currentRole = \Bazalt\Auth::getCurrentRole();
-                if($currentRole) {
-                    $roles = [
-                        $currentRole
-                    ];
-                }
-            }
-            foreach($roles as $role) {
-                $res = $role->getPermissions();
+            if($splitRoles) {
+                $q = ORM::select('Bazalt\\Auth\\Model\\Permission p', 'p.id')
+                    ->innerJoin('Bazalt\\Auth\\Model\\RoleRefPermission rp', ['permission_id', 'p.id'])
+                    ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'rp.role_id'])
+                    ->where('ru.user_id = ?', $this->id);
+                $res = $q->fetchAll();
                 foreach ($res as $perm) {
-                    $ret[$perm->id] = $perm->id;
+                    $ret []= $perm->id;
+                }
+            } else {
+                $roles = Role::getGuestRoles();
+                if(!$this->isGuest()) {
+                    $currentRole = \Bazalt\Auth::getCurrentRole();
+                    if($currentRole) {
+                        $roles = [
+                            $currentRole
+                        ];
+                    }
+                }
+                foreach($roles as $role) {
+                    $res = $role->getPermissions();
+                    foreach ($res as $perm) {
+                        $ret[$perm->id] = $perm->id;
+                    }
                 }
             }
         }
 
-        return array_values($ret);
+        $ret = array_values($ret);
+        if(!$this->isGuest()) {
+            $ret []= 'auth.user_logged';
+        }
+        return $ret;
     }
 
     /**

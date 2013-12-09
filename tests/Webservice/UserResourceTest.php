@@ -51,14 +51,7 @@ class UserResourceTest extends \Bazalt\Auth\Test\BaseCase
         $user = User::getById($user->id);
         $this->assertEquals(0, $user->is_deleted);
 
-        $role = Role::create();
-        $role->title = 'test';
-        $role->save();
-        $this->models []= $role;
-
-        $role->Permissions->add(Permission::getById('auth.can_delete_user'));
-
-        $user->Roles->add($role, ['site_id' => \Bazalt\Site::getId()]);
+        $this->addPermission('auth.can_delete_user', $user);
 
         // login
         \Bazalt\Auth::setUser($user);
@@ -75,7 +68,7 @@ class UserResourceTest extends \Bazalt\Auth\Test\BaseCase
         $user2->save();
         $this->models []= $user2;
 
-        $user2->Roles->add($role, ['site_id' => \Bazalt\Site::getId()]);
+        $this->addPermission('auth.can_delete_user', $user2);
 
         // login
         \Bazalt\Auth::setUser($user2);
