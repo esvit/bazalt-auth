@@ -21,7 +21,7 @@ class UserResourceTest extends \Bazalt\Auth\Test\BaseCase
 
         $config = array(
             'load' => array(
-                __DIR__ .'/../../server/Bazalt/Auth/Webservice/*.php'
+                __DIR__ .'/../../src/Bazalt/Auth/Webservice/*.php'
             )
         );
         $this->app = new Tonic\Application($config);
