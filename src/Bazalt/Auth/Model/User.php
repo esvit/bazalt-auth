@@ -160,6 +160,7 @@ class User extends Base\User
         unset($ret['session_id']);
 
         $ret['fullname'] = $this->getName();
+        $ret['age'] = $this->getAge();
         $ret['birth_date'] = date('d.m.Y', strToTime($this->birth_date));
         $ret['is_active'] = $this->is_active == '1';
         //if ($this->is_deleted) {
@@ -313,6 +314,14 @@ class User extends Base\User
             $name = $this->login;
         }
         return $name;
+    }
+
+    public function getAge()
+    {
+        $date = new \DateTime($this->birth_date);
+        $now = new \DateTime();
+        $interval = $now->diff($date);
+        return $interval->y;
     }
     
     public static function getOnlineUsers()
