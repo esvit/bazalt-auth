@@ -195,13 +195,15 @@ class User extends Base\User
         $q = ORM::select('Bazalt\Auth\Model\User u')
                 ->where('login = ?', $login)
                 ->andWhere('password = ?', $password)
-                ->andWhere('is_active = ?', 1);
+                ->andWhere('is_active = ?', 1)
+                ->andWhere('is_deleted = ?', 0);
         $user = $q->fetch();
         if (!$user && $checkMail) {
             $q = ORM::select('Bazalt\Auth\Model\User u')
                     ->where('email = ?', $login)
                     ->andWhere('password = ?', $password)
-                    ->andWhere('is_active = ?', 1);
+                    ->andWhere('is_active = ?', 1)
+                    ->andWhere('is_deleted = ?', 0);
             $user = $q->fetch();
         }
         return $user;
