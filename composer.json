@@ -21,7 +21,8 @@
         "bazalt/rest": "dev-master",
         "bazalt/site": "dev-master",
         "swiftmailer/swiftmailer": "*",
-        "bazalt/session": "dev-master"
+        "bazalt/session": "dev-master",
+        "firebase/php-jwt": "dev-master"
     },
     "require-dev": {
         "satooshi/php-coveralls": "dev-master"
