@@ -8,6 +8,7 @@ $config = \Bazalt\Config::container();
 $config['jwt.key'] = 'key';
 ```
 
+
 ## GET /auth/session
 
 Return current logined user
