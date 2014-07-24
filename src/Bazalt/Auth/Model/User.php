@@ -84,12 +84,20 @@ class User extends Base\User
     {
         $site = ($site) ? $site : \Bazalt\Site::get();
 
-        $q = ORM::select('Bazalt\\Auth\\Model\\RoleRefUser ru', 'COUNT(*) as cnt')
+        //get all sites roles
+        $ql = ORM::select('Bazalt\\Auth\\Model\\RoleRefUser ru', 'COUNT(*) as cnt')
           ->andWhere('ru.user_id = ?', $this->id)
           ->andWhere('ru.site_id = ?', $site->id)
           ->andWhere('ru.role_id = ?', $roleId);
 
-        return (int)$q->fetch('stdClass')->cnt > 0;
+        //get all global roles
+        $qg = ORM::select('Bazalt\\Auth\\Model\\RoleRefUser ru', 'COUNT(*) as cnt')
+            ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id'])
+            ->where('r.site_id IS NULL')
+            ->andWhere('ru.user_id = ?', $this->id)
+            ->andWhere('ru.role_id = ?', $roleId);
+
+        return (int)$ql->fetch('stdClass')->cnt > 0 || (int)$qg->fetch('stdClass')->cnt > 0;
     }
 
     public function getRoles($site = null)
@@ -100,12 +108,23 @@ class User extends Base\User
             return $q->fetchAll();
         }
         $site = ($site) ? $site : \Bazalt\Site::get();
-        $q = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
+
+        //get all sites roles
+        $ql = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
             ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id'])
-            ->where('(r.site_id IS NULL OR r.site_id = ?)', $site->id)
-            ->andWhere('ru.user_id = ?', $this->id)
-            ->andWhere('ru.site_id = ?', $site->id);
-        return $q->fetchAll();
+            ->andWhere('ru.user_id = ?', $user->id)
+            ->andWhere('ru.site_id = ?', $site->id)
+            ->andWhere('r.site_id = ?', $site->id);
+
+
+        //get all global roles
+        $qg = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
+            ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id'])
+            ->where('r.site_id IS NULL')
+            ->andWhere('ru.user_id = ?', $user->id);
+
+        $q = ORM::union($ql, $qg);
+        return $q->fetchAll('Bazalt\\Auth\\Model\\Role');
     }
 
     /**
