@@ -112,7 +112,7 @@ class User extends Base\User
         //get all sites roles
         $ql = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
             ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id'])
-            ->andWhere('ru.user_id = ?', $user->id)
+            ->andWhere('ru.user_id = ?', $this->id)
             ->andWhere('ru.site_id = ?', $site->id)
             ->andWhere('r.site_id = ?', $site->id);
 
@@ -121,7 +121,7 @@ class User extends Base\User
         $qg = ORM::select('Bazalt\\Auth\\Model\\Role r', 'r.*')
             ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id'])
             ->where('r.site_id IS NULL')
-            ->andWhere('ru.user_id = ?', $user->id);
+            ->andWhere('ru.user_id = ?', $this->id);
 
         $q = ORM::union($ql, $qg);
         return $q->fetchAll('Bazalt\\Auth\\Model\\Role');
