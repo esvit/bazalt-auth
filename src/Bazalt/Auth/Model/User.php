@@ -12,7 +12,9 @@ class User extends Base\User
     protected $systemAcl = null;
 
     protected $levels = [];
-    
+
+    protected $_settings = [];
+
     protected $timeOffset = null;
 
     /**
@@ -144,6 +146,10 @@ class User extends Base\User
      */
     public function setting($name, $value = null, $default = null)
     {
+        if (isset($this->_settings[$name]) && $value === null) {
+            return $this->_settings[$name];
+        }
+
         $setting = UserSetting::getUserSetting($this, $name);
         if (!$setting && $value === null) {
             return $default;
@@ -155,6 +161,8 @@ class User extends Base\User
             $setting->value = $value;
             $setting->save();
         }
+        $this->_settings[$name] = $setting->value;
+
         return $setting->value;
     }
 
