@@ -162,7 +162,6 @@ class User extends Base\User
             $setting->save();
         }
         $this->_settings[$name] = $setting->value;
-
         return $setting->value;
     }
 
