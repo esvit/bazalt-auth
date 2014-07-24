@@ -92,7 +92,7 @@ class User extends Base\User
 
         //get all global roles
         $qg = ORM::select('Bazalt\\Auth\\Model\\RoleRefUser ru', 'COUNT(*) as cnt')
-            ->innerJoin('Bazalt\\Auth\\Model\\RoleRefUser ru', ['role_id', 'r.id'])
+            ->innerJoin('Bazalt\\Auth\\Model\\Role r', ['id', 'ru.role_id'])
             ->where('r.site_id IS NULL')
             ->andWhere('ru.user_id = ?', $this->id)
             ->andWhere('ru.role_id = ?', $roleId);
