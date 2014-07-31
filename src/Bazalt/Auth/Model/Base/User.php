@@ -24,6 +24,7 @@ namespace Bazalt\Auth\Model\Base;
  * @property-read string $created_at
  * @property-read bool $is_god
  * @property-read bool $need_edit
+ * @property-read string $tags
  */
 abstract class User extends \Bazalt\ORM\Record
 {
