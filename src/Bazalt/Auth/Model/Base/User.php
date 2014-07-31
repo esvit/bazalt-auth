@@ -48,6 +48,7 @@ abstract class User extends \Bazalt\ORM\Record
         $this->hasColumn('email', 'N:varchar(60)');
         $this->hasColumn('gender', "ENUM('unknown','male','female')|'unknown'");
         $this->hasColumn('birth_date', 'N:date');
+        $this->hasColumn('tags', 'N:text');
         $this->hasColumn('is_active', 'U:tinyint(1)');
         $this->hasColumn('is_deleted', 'U:tinyint(1)|0');
         $this->hasColumn('last_activity', 'N:datetime');
